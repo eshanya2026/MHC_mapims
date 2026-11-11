@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - Official Appointment Pass | MAPIMS</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}?v=3.3">
+</head>
+<body class="confirmation-body">
+    <header class="mapims-header no-print">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                    <div>
+                        <h1 class="mapims-logo">MAPIMS</h1>
+                        <p class="tagline" data-translate="header.tagline">Professional Healthcare Excellence</p>
+                    </div>
+                </div>
+                <div class="header-nav-wrapper">
+                    <div class="header-trust-tag">
+                        <span class="trust-dot"></span>
+                        <span>NABH Accredited Hospital</span>
+                    </div>
+                    <div class="language-switcher">
+                        <button id="languageToggle" class="language-toggle" onclick="toggleLanguage()" title="Switch Language">
+                            <span id="languageIcon">த</span>
+                            <span class="lang-text">தமிழ்</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="confirmation-main">
+        <div class="container">
+            <!-- Digital Hospital Appointment Voucher Pass -->
+            <div class="appointment-pass-card" id="appointmentPass">
+                <!-- Top Brand Header -->
+                <div class="pass-header">
+                    <div class="pass-hospital-brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="pass-hospital-logo">
+                        <div class="pass-hospital-info">
+                            <h2>Melmaruvathur Adhiparasakthi Institute of Medical Sciences</h2>
+                            <p class="pass-accredit">NABH Accredited Multi-Super Speciality Hospital & Research Center</p>
+                        </div>
+                    </div>
+                    <div class="pass-status-pill">
+                        <span class="pulse-emerald"></span>
+                        <span>CONFIRMED APPOINTMENT</span>
+                    </div>
+                </div>
+
+                <!-- Pass Success Banner -->
+                <div class="pass-hero-banner">
+                    <div class="pass-check-icon">✓</div>
+                    <div class="pass-hero-text">
+                        <h1>Your Health Checkup is Reserved!</h1>
+                        <p>We look forward to welcoming you for your executive health assessment at MAPIMS.</p>
+                    </div>
+                </div>
+
+                <!-- Barcode & Monospace Reference Strip -->
+                <div class="pass-reference-strip">
+                    <div class="reference-box">
+                        <span class="reference-label">APPOINTMENT REFERENCE ID</span>
+                        <div class="reference-code-row">
+                            <span class="reference-code" id="bookingRefText">{{ booking_reference }}</span>
+                            <button type="button" class="btn-copy-ref" onclick="copyReferenceCode()" title="Copy Reference ID">
+                                <span id="copyBtnText">📋 Copy ID</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="pass-barcode-graphic">
+                        <div class="barcode-bars"></div>
+                        <span class="barcode-number">{{ booking_reference }}</span>
+                    </div>
+                </div>
+
+                <!-- 4-Tile Detail Grid -->
+                <div class="pass-details-grid">
+                    <div class="pass-tile">
+                        <div class="tile-icon">👤</div>
+                        <div class="tile-content">
+                            <span class="tile-label">PATIENT NAME</span>
+                            <strong class="tile-value">{{ patient_name|default('Valued Patient') }}</strong>
+                            {% if patient_phone %}
+                            <span class="tile-subtext">📱 {{ patient_phone }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="pass-tile">
+                        <div class="tile-icon">🩺</div>
+                        <div class="tile-content">
+                            <span class="tile-label">CHECKUP PACKAGE</span>
+                            <strong class="tile-value text-red">{{ package_name|default('Executive Health Package') }}</strong>
+                            <span class="tile-subtext">All lab tests & specialist consultations</span>
+                        </div>
+                    </div>
+
+                    <div class="pass-tile highlight-tile">
+                        <div class="tile-icon">🗓️</div>
+                        <div class="tile-content">
+                            <span class="tile-label">SCHEDULED DATE & TIME</span>
+                            <strong class="tile-value">{{ booking_date|default('Scheduled Date') }}</strong>
+                            <span class="tile-subtext text-urgent">⏱ 08:00 AM (Fasting Sample Required)</span>
+                        </div>
+                    </div>
+
+                    <div class="pass-tile">
+                        <div class="tile-icon">💳</div>
+                        <div class="tile-content">
+                            <span class="tile-label">AMOUNT PAYABLE AT HOSPITAL</span>
+                            <strong class="tile-value price-tag">₹{{ total_price|default('0') }}</strong>
+                            <span class="tile-subtext">Cash, UPI, Debit / Credit Cards accepted</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fasting & Reporting Instructions Card -->
+                <div class="pass-instructions-card">
+                    <div class="instructions-header">
+                        <span class="inst-icon">🍽️</span>
+                        <h3>Mandatory Fasting & Arrival Protocol</h3>
+                    </div>
+                    <div class="instructions-body">
+                        <div class="inst-item">
+                            <span class="inst-bullet">1</span>
+                            <div>
+                                <strong>Overnight Fasting (10–12 Hours):</strong>
+                                <p>Please do not consume food, milk, tea, coffee, or snacks after 9:00 PM on the night before your checkup. Plain drinking water is permitted and encouraged.</p>
+                            </div>
+                        </div>
+                        <div class="inst-item">
+                            <span class="inst-bullet">2</span>
+                            <div>
+                                <strong>Reporting Time & Venue:</strong>
+                                <p>Please report at <strong>8:00 AM sharp</strong> to the <strong>Executive Health Checkup Lounge, Ground Floor</strong>, MAPIMS Hospital Main Wing.</p>
+                            </div>
+                        </div>
+                        <div class="inst-item">
+                            <span class="inst-bullet">3</span>
+                            <div>
+                                <strong>Regular Medications:</strong>
+                                <p>If taking routine hypertension or cardiac medications, take them with sips of water. Diabetic morning doses should be taken only after the fasting blood draw.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Contact Strip -->
+                <div class="pass-hospital-location">
+                    <div class="location-item">
+                        <span class="loc-icon">📍</span>
+                        <div>
+                            <strong>Hospital Address</strong>
+                            <p>Melmaruvathur Adhiparasakthi Institute of Medical Sciences (MAPIMS), GST Road, Melmaruvathur - 603319, Tamil Nadu</p>
+                        </div>
+                    </div>
+                    <div class="location-item">
+                        <span class="loc-icon">📞</span>
+                        <div>
+                            <strong>Checkup Helpdesk & Enquiries</strong>
+                            <p>+91 44 2752 9000 • +91 44 2752 9001 (Ext: 215)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pass Actions (Print, Calendar, Home) -->
+                <div class="pass-actions no-print">
+                    <button type="button" class="btn-pass-action primary" onclick="addToGoogleCalendar()">
+                        <span>📅 Add to Google Calendar</span>
+                    </button>
+                    <button type="button" class="btn-pass-action secondary" onclick="window.print()">
+                        <span>🖨️ Print / Save Pass</span>
+                    </button>
+                    <a href="{{ url_for('landing') }}" class="btn-pass-action outline">
+                        <span>🏠 Return to Home</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        function toggleLanguage() {
+            const newLang = (typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? 'ta' : 'en';
+            if (typeof setLanguage === 'function') {
+                setLanguage(newLang);
+            }
+        }
+
+        function copyReferenceCode() {
+            const refText = document.getElementById('bookingRefText').textContent.trim();
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(refText).then(() => {
+                    const btnText = document.getElementById('copyBtnText');
+                    btnText.textContent = '✓ Copied!';
+                    setTimeout(() => {
+                        btnText.textContent = '📋 Copy ID';
+                    }, 2500);
+                }).catch(() => {
+                    fallbackCopy(refText);
+                });
+            } else {
+                fallbackCopy(refText);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const temp = document.createElement('input');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            const btnText = document.getElementById('copyBtnText');
+            btnText.textContent = '✓ Copied!';
+            setTimeout(() => {
+                btnText.textContent = '📋 Copy ID';
+            }, 2500);
+        }
+
+        function addToGoogleCalendar() {
+            const packageName = "{{ package_name|default('MAPIMS Health Checkup') }}";
+            const bookingDate = "{{ booking_date }}";
+            let startTime = "080000";
+            let endTime = "130000";
+            
+            // Format date for Google Calendar: YYYYMMDD
+            let formattedDate = "";
+            if (bookingDate) {
+                // If format DD-MM-YYYY
+                if (bookingDate.includes('-')) {
+                    const parts = bookingDate.split('-');
+                    if (parts[0].length === 2 && parts[2].length === 4) {
+                        formattedDate = parts[2] + parts[1] + parts[0];
+                    } else if (parts[0].length === 4) {
+                        formattedDate = parts[0] + parts[1] + parts[2];
+                    }
+                }
+            }
+            if (!formattedDate) {
+                const tom = new Date();
+                tom.setDate(tom.getDate() + 1);
+                formattedDate = tom.toISOString().split('T')[0].replace(/-/g, '');
+            }
+
+            const dates = formattedDate + "T" + startTime + "/" + formattedDate + "T" + endTime;
+            const title = encodeURIComponent("MAPIMS Health Checkup - " + packageName);
+            const details = encodeURIComponent("Appointment Reference: {{ booking_reference }}\nPackage: " + packageName + "\nReporting Time: 8:00 AM (Empty Stomach Fasting)\nLocation: Executive Health Checkup Lounge, MAPIMS Hospital, Melmaruvathur");
+            const location = encodeURIComponent("MAPIMS Multispeciality Hospital, GST Road, Melmaruvathur - 603319");
+
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
+            window.open(gcalUrl, '_blank');
+        }
+    </script>
+</body>
+</html>

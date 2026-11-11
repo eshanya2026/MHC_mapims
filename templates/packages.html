@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Checkup Packages - MAPIMS</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}?v=4.9">
+    <style>
+        .package-item-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header class="mapims-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                    <div>
+                        <h1 class="mapims-logo">MAPIMS</h1>
+                        <p class="tagline" data-translate="header.tagline">Professional Healthcare Excellence</p>
+                    </div>
+                </div>
+                <div class="header-nav-wrapper">
+                    <div class="header-trust-tag">
+                        <span class="trust-dot"></span>
+                        <span>NABH Accredited Hospital</span>
+                    </div>
+                    <div class="language-switcher">
+                        <button id="languageToggle" class="language-toggle" onclick="toggleLanguage()" title="Switch Language">
+                            <span class="globe-icon">🌐</span>
+                            <span id="languageIcon">தமிழ்</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="packages-main">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="packages-hero-head">
+                <div class="hero-beacon">✦ Certified Preventive Healthcare</div>
+                <h1 class="page-title" data-translate="packages.title">Recommended Health Checkup Packages</h1>
+                <p class="page-subtitle" data-translate="packages.subtitle">Based on your ML-powered health assessment, choose the comprehensive health checkup package designed for your profile.</p>
+                
+                <!-- Filter Pills -->
+                <div class="packages-filter-bar">
+                    <button type="button" class="filter-pill active" data-filter="all" onclick="filterPackages('all', event)">
+                        <span>All Checkups (6)</span>
+                    </button>
+                    {% if primary_recommended_package %}
+                    <button type="button" class="filter-pill pill-rec" data-filter="recommended" onclick="filterPackages('recommended', event)">
+                        <span>⭐ Recommended for You</span>
+                    </button>
+                    {% endif %}
+                    <button type="button" class="filter-pill" data-filter="diabetic" onclick="filterPackages('diabetic', event)">
+                        <span>🩺 Diabetic Care (2)</span>
+                    </button>
+                    <button type="button" class="filter-pill" data-filter="general" onclick="filterPackages('general', event)">
+                        <span>🏥 General Wellness (4)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Packages Grid (3:3 layout) -->
+            <div class="packages-grid">
+                {% for package_id, package in packages.items() %}
+                <div class="package-card {% if package_id == primary_recommended_package %}primary-recommended{% endif %}" 
+                     data-package-id="{{ package_id }}" 
+                     data-category="{% if 'diabetic' in package_id %}diabetic{% else %}general{% endif %}"
+                     onclick="selectPackage('{{ package_id }}', event)">
+                    
+                    <!-- Card Top Header -->
+                    <div class="package-header-top">
+                        <span class="package-category-chip">
+                            {% if package_id == 'premium_diabetic' %}Advanced Diabetic Care
+                            {% elif package_id == 'diabetic' %}Diabetic Screening
+                            {% elif package_id == 'senior' %}Senior & Women Care
+                            {% elif package_id == 'comprehensive' %}Executive Full Body
+                            {% elif package_id == 'standard' %}Comprehensive Health
+                            {% else %}Essential Wellness{% endif %}
+                        </span>
+                        {% if package_id == primary_recommended_package %}
+                        <span class="primary-recommended-badge" data-translate="packages.primaryRecommended">⭐ MAPIMS Recommended</span>
+                        {% endif %}
+                    </div>
+
+                    <h3 class="package-name">{{ package.name }}</h3>
+
+                    <!-- Price & Specs Meta -->
+                    <div class="package-price-wrap">
+                        <div class="package-price-row">
+                            <span class="currency">₹</span>
+                            <span class="price-val">{{ package.price }}</span>
+                            <span class="inclusive-tag">All-inclusive</span>
+                        </div>
+                        <div class="package-meta-row">
+                            {% if package.duration %}
+                            <span class="package-duration">⏱ {{ package.duration }}</span>
+                            {% endif %}
+                            <span class="package-tests-pill">{{ package.includes|length }} Tests Included</span>
+                        </div>
+                    </div>
+
+                    <p class="package-description">{{ package.description }}</p>
+
+                    <!-- Included Tests List -->
+                    <div class="package-includes">
+                        <div class="package-includes-header">
+                            <h4 data-translate="packages.includes">Included Tests & Consultations:</h4>
+                            <span class="tests-count-badge">{{ package.includes|length }} items</span>
+                        </div>
+                        <ul class="package-includes-list" data-package-includes="{{ package.includes|join('|||') }}">
+                            {% for item in package.includes %}
+                            <li class="{% if loop.index > 4 %}package-item-hidden{% endif %}" data-item="{{ item }}" data-original-text="{{ item }}">{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if package.includes|length > 4 %}
+                        <div class="package-more-indicator" data-package-id="{{ package_id }}" onclick="toggleExpandItems('{{ package_id }}', event)">
+                            <span class="package-more-text">
+                                <span class="more-label">+{{ package.includes|length - 4 }} more items</span>
+                                <span class="more-arrow">▼</span>
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Select Package Button -->
+                    <button type="button" class="btn-select-package" onclick="selectPackage('{{ package_id }}', event)">
+                        <span class="select-btn-text" data-translate="packages.selectPackage">Select Package</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Bottom Default Action -->
+            <div class="package-actions">
+                <button type="button" class="btn-proceed-booking" onclick="proceedToBooking()">
+                    <span data-translate="packages.proceedBooking">Proceed to Booking</span>
+                    <span class="arrow-icon">→</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sticky Bottom Bar that slides up when package is selected -->
+    <div id="stickySelectionBar" class="sticky-selection-bar">
+        <div class="container sticky-selection-inner">
+            <div class="sticky-left">
+                <div class="sticky-check-icon">✓</div>
+                <div class="sticky-details">
+                    <span class="sticky-eyebrow">Selected Health Package</span>
+                    <h4 id="stickyPkgName" class="sticky-pkg-name">No package selected</h4>
+                </div>
+            </div>
+            <div class="sticky-right">
+                <div class="sticky-price-wrap">
+                    <span class="sticky-price-sub">Payable at Visit</span>
+                    <span id="stickyPkgPrice" class="sticky-price-val">₹0</span>
+                </div>
+                <button type="button" class="btn-proceed-sticky" onclick="proceedToBooking()">
+                    <span data-translate="packages.proceedBooking">Proceed to Booking</span>
+                    <span class="sticky-arrow">→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}?v=4.9"></script>
+    <script>
+        function toggleLanguage() {
+            const newLang = (typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? 'ta' : 'en';
+            if (typeof setLanguage === 'function') {
+                setLanguage(newLang);
+            }
+        }
+
+        const packagesData = {
+            {% for package_id, package in packages.items() %}
+            '{{ package_id }}': {
+                name: '{{ package.name }}',
+                includes: {{ package.includes|tojson }},
+                price: {{ package.price }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        };
+
+        let selectedPackage = null;
+        const INITIAL_ITEMS_TO_SHOW = 4;
+        const PRIMARY_RECOMMENDED_PACKAGE = '{{ primary_recommended_package|default("") }}';
+
+        // Filter packages by category
+        function filterPackages(category, event) {
+            if (event) event.preventDefault();
+            
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+
+            const cards = document.querySelectorAll('.package-card');
+            cards.forEach(card => {
+                const pkgCategory = card.getAttribute('data-category');
+                const isRecommended = card.classList.contains('primary-recommended');
+
+                if (category === 'all') {
+                    card.style.display = 'flex';
+                } else if (category === 'recommended') {
+                    card.style.display = isRecommended ? 'flex' : 'none';
+                } else if (category === 'diabetic') {
+                    card.style.display = (pkgCategory === 'diabetic') ? 'flex' : 'none';
+                } else if (category === 'general') {
+                    card.style.display = (pkgCategory === 'general') ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // Initialize package display
+        function initializePackages() {
+            document.querySelectorAll('.package-card').forEach(card => {
+                const packageId = card.dataset.packageId;
+                const includesList = card.querySelector('.package-includes-list');
+                const allItems = includesList.querySelectorAll('li');
+                const moreIndicator = card.querySelector('.package-more-indicator');
+                
+                allItems.forEach((item, index) => {
+                    if (index >= INITIAL_ITEMS_TO_SHOW) {
+                        item.classList.add('package-item-hidden');
+                    }
+                });
+                
+                if (allItems.length > INITIAL_ITEMS_TO_SHOW && moreIndicator) {
+                    const hiddenCount = allItems.length - INITIAL_ITEMS_TO_SHOW;
+                    const moreLabel = moreIndicator.querySelector('.more-label');
+                    if (moreLabel) {
+                        moreLabel.textContent = `+${hiddenCount} more tests`;
+                    }
+                    moreIndicator.style.display = 'block';
+                }
+            });
+
+            // If a primary recommended package exists, auto-select it for better UX
+            if (PRIMARY_RECOMMENDED_PACKAGE && packagesData[PRIMARY_RECOMMENDED_PACKAGE]) {
+                selectPackage(PRIMARY_RECOMMENDED_PACKAGE);
+            }
+        }
+
+        // Toggle expand/collapse items independently
+        function toggleExpandItems(packageId, event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+
+            const card = document.querySelector(`.package-card[data-package-id="${packageId}"]`);
+            if (!card) return;
+
+            const includesList = card.querySelector('.package-includes-list');
+            const allItems = includesList.querySelectorAll('li');
+            const moreIndicator = card.querySelector('.package-more-indicator');
+            const moreLabel = moreIndicator ? moreIndicator.querySelector('.more-label') : null;
+            const moreArrow = moreIndicator ? moreIndicator.querySelector('.more-arrow') : null;
+
+            const isCurrentlyExpanded = card.getAttribute('data-expanded') === 'true';
+
+            if (isCurrentlyExpanded) {
+                // Collapse back to initial items
+                allItems.forEach((item, index) => {
+                    if (index >= INITIAL_ITEMS_TO_SHOW) {
+                        item.classList.add('package-item-hidden');
+                    }
+                });
+                card.setAttribute('data-expanded', 'false');
+                if (moreLabel) moreLabel.textContent = `+${allItems.length - INITIAL_ITEMS_TO_SHOW} more tests`;
+                if (moreArrow) moreArrow.textContent = '▼';
+            } else {
+                // Expand all
+                allItems.forEach(item => {
+                    item.classList.remove('package-item-hidden');
+                });
+                card.setAttribute('data-expanded', 'true');
+                if (moreLabel) moreLabel.textContent = 'Show fewer tests';
+                if (moreArrow) moreArrow.textContent = '▲';
+            }
+        }
+
+        function selectPackage(packageId, event) {
+            if (event) {
+                event.preventDefault();
+            }
+            
+            selectedPackage = packageId;
+            const pkgInfo = packagesData[packageId];
+            if (!pkgInfo) return;
+
+            // Update card selected classes
+            document.querySelectorAll('.package-card').forEach(card => {
+                const cardPkgId = card.dataset.packageId;
+                const btn = card.querySelector('.btn-select-package');
+                const btnText = btn ? btn.querySelector('.select-btn-text') : null;
+
+                if (cardPkgId === packageId) {
+                    card.classList.add('selected');
+                    if (btn) btn.classList.add('selected');
+                    if (btnText) {
+                        btnText.setAttribute('data-translate', 'packages.selected');
+                        btnText.textContent = (typeof currentLanguage !== 'undefined' && currentLanguage === 'ta') ? '✓ தேர்வு செய்யப்பட்டது' : '✓ Selected Package';
+                    }
+                } else {
+                    card.classList.remove('selected');
+                    if (btn) btn.classList.remove('selected');
+                    if (btnText) {
+                        btnText.setAttribute('data-translate', 'packages.selectPackage');
+                        btnText.textContent = (typeof currentLanguage !== 'undefined' && currentLanguage === 'ta') ? 'தேர்வு செய்' : 'Select Package';
+                    }
+                }
+            });
+
+            // Update and show sticky bottom selection bar
+            const stickyBar = document.getElementById('stickySelectionBar');
+            const stickyName = document.getElementById('stickyPkgName');
+            const stickyPrice = document.getElementById('stickyPkgPrice');
+
+            if (stickyBar && stickyName && stickyPrice) {
+                stickyName.textContent = pkgInfo.name;
+                stickyPrice.textContent = `₹${pkgInfo.price}`;
+                stickyBar.classList.add('visible');
+            }
+        }
+
+        function proceedToBooking() {
+            if (!selectedPackage) {
+                alert('Please select a health checkup package to proceed');
+                return;
+            }
+
+            fetch('/api/select-package', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    package_id: selectedPackage
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = "{{ url_for('booking') }}";
+                }
+            })
+            .catch(err => {
+                console.error('Error selecting package:', err);
+                window.location.href = "{{ url_for('booking') }}";
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePackages);
+        } else {
+            initializePackages();
+        }
+    </script>
+</body>
+</html>

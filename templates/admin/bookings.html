@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings - MAPIMS Admin</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="container">
+            <div class="admin-header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                    <div>
+                        <h1 class="mapims-logo">MAPIMS</h1>
+                        <p class="tagline">Admin Portal</p>
+                    </div>
+                </div>
+                <nav class="admin-nav">
+                    <a href="/admin/dashboard">Dashboard</a>
+                    <a href="/admin/leads">Leads</a>
+                    <a href="/admin/bookings">Bookings</a>
+                    <a href="/admin/logout">Logout</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            <h1 class="admin-page-title">All Bookings</h1>
+            
+            <!-- Date Filter -->
+            <div class="filter-controls" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <label for="start_date" style="font-weight: 600;">From:</label>
+              <input type="date" id="start_date" name="start_date" value="{{ start_date }}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+              <label for="end_date" style="font-weight: 600;">To:</label>
+              <input type="date" id="end_date" name="end_date" value="{{ end_date }}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+              <button onclick="applyFilters()" style="padding: 8px 16px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Filter</button>
+              <button onclick="clearFilters()" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Clear</button>
+              <button onclick="showExportModal()" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Export Excel
+              </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Reference</th>
+                            <th>Patient</th>
+                            <th>Package</th>
+                            <th>Total Amount</th>
+                            <th>Booking Date</th>
+                            <th>Time</th>
+                            <th>Sample Type</th>
+                            <th>Payment Status</th>
+                            <th>Status</th>
+                            <th>WhatsApp Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ ((page - 1) * per_page) + loop.index }}</td>
+                            <td>{{ booking.booking_reference }}</td>
+                            <td>{{ booking.patient_name }}<br>{{ booking.patient_phone }}</td>
+                            <td>{{ booking.package_name }}</td>
+                            <td>₹{{ booking.total_price }}</td>
+                            <td>{% if booking.booking_date %}{{ booking.booking_date.strftime('%Y-%m-%d') }}{% else %}N/A{% endif %}</td>
+                            <td>{{ booking.booking_time }}</td>
+                            <td>{{ booking.sample_type }}</td>
+                            <td><span class="status-badge {{ booking.payment_status }}">{{ booking.payment_status }}</span></td>
+                            <td><span class="status-badge {{ booking.booking_status }}">{{ booking.booking_status }}</span></td>
+                            <td style="white-space: nowrap;">
+                                {% set whatsapp_status = booking.get('whatsapp_message_status', 'pending') %}
+                                {% if whatsapp_status == 'sent' %}
+                                    <span style="display: inline-flex; align-items: center; gap: 5px; color: #25D366; font-weight: 600;" title="WhatsApp message sent successfully">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898a9.825 9.825 0 012.853 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" fill="#25D366"/>
+                                            <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        Sent
+                                    </span>
+                                {% elif whatsapp_status == 'failed' %}
+                                    <span style="display: inline-flex; align-items: center; gap: 5px; color: #E31837; font-weight: 600;" title="WhatsApp message failed to send">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898a9.825 9.825 0 012.853 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" fill="#E31837"/>
+                                            <path d="M15 9l-6 6M9 9l6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        Failed
+                                    </span>
+                                {% else %}
+                                    <span style="display: inline-flex; align-items: center; gap: 5px; color: #666; font-weight: 600;" title="WhatsApp message pending">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.98 2.898a9.825 9.825 0 012.853 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" fill="#666"/>
+                                        </svg>
+                                        Pending
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-controls" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>Showing {{ ((page - 1) * per_page) + 1 }} to {{ ((page - 1) * per_page) + bookings|length }} of {{ total_bookings_count }} entries</span>
+                <select id="per_page" onchange="changePerPage()" style="padding: 6px; border: 2px solid #ddd; border-radius: 4px;">
+                  <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                  <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                  <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                  <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 5px;">
+                {% if page > 1 %}
+                {% set prev_page = page - 1 %}
+                <button class="pagination-btn" data-page="{{ prev_page }}" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Previous</button>
+                {% endif %}
+                {% for p in range(1, total_pages + 1) %}
+                  {% if p == page %}
+                  <button style="padding: 8px 12px; background: #B8142C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">{{ p }}</button>
+                  {% elif p <= 3 or p > total_pages - 3 or (p >= page - 1 and p <= page + 1) %}
+                  <button class="pagination-btn" data-page="{{ p }}" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">{{ p }}</button>
+                  {% elif p == 4 or p == total_pages - 3 %}
+                  <span style="padding: 8px;">...</span>
+                  {% endif %}
+                {% endfor %}
+                {% if page < total_pages %}
+                {% set next_page = page + 1 %}
+                <button class="pagination-btn" data-page="{{ next_page }}" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Next</button>
+                {% endif %}
+              </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Export Modal -->
+    <div id="exportModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div style="background-color: #fefefe; margin: 5% auto; padding: 30px; border: 1px solid #888; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #E31837; font-size: 1.5rem;">Export to Excel</h2>
+                <span onclick="closeExportModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px; color: #333; font-size: 1.1rem;">Select Columns to Export:</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="sno" checked style="cursor: pointer;">
+                        <span>S.No</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="reference" checked style="cursor: pointer;">
+                        <span>Reference</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="patient_name" checked style="cursor: pointer;">
+                        <span>Patient Name</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="patient_phone" checked style="cursor: pointer;">
+                        <span>Patient Phone</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="package" checked style="cursor: pointer;">
+                        <span>Package</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="total_amount" checked style="cursor: pointer;">
+                        <span>Total Amount</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="booking_date" checked style="cursor: pointer;">
+                        <span>Booking Date</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="time" checked style="cursor: pointer;">
+                        <span>Time</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="sample_type" checked style="cursor: pointer;">
+                        <span>Sample Type</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="payment_status" checked style="cursor: pointer;">
+                        <span>Payment Status</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="booking_status" checked style="cursor: pointer;">
+                        <span>Booking Status</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="created_date" checked style="cursor: pointer;">
+                        <span>Created Date</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="whatsapp_status" checked style="cursor: pointer;">
+                        <span>WhatsApp Message Status</span>
+                    </label>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button onclick="selectAllColumns()" style="padding: 6px 12px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Select All</button>
+                    <button onclick="deselectAllColumns()" style="padding: 6px 12px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Deselect All</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="hideHeaders" style="cursor: pointer; width: 18px; height: 18px;">
+                    <span style="font-weight: 600; color: #333;">Hide Column Headers in Excel</span>
+                </label>
+                <p style="margin: 8px 0 0 28px; color: #666; font-size: 0.9rem;">If checked, the header row will be hidden in the exported Excel file.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="closeExportModal()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Cancel</button>
+                <button onclick="exportToExcel()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Export</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+      function applyFilters() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const perPage = document.getElementById('per_page') ? document.getElementById('per_page').value : '{{ per_page }}';
+        const url = new URL(window.location.href);
+        url.searchParams.set('start_date', startDate);
+        url.searchParams.set('end_date', endDate);
+        url.searchParams.set('page', '1');
+        url.searchParams.set('per_page', perPage);
+        window.location.href = url.toString();
+      }
+      
+      function clearFilters() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('start_date');
+        url.searchParams.delete('end_date');
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+      }
+      
+      function goToPage(page) {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const perPage = document.getElementById('per_page') ? document.getElementById('per_page').value : '{{ per_page }}';
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        url.searchParams.set('start_date', startDate);
+        url.searchParams.set('end_date', endDate);
+        url.searchParams.set('per_page', perPage);
+        window.location.href = url.toString();
+      }
+      
+      function changePerPage() {
+        const perPage = document.getElementById('per_page').value;
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.set('page', '1');
+        url.searchParams.set('start_date', startDate);
+        url.searchParams.set('end_date', endDate);
+        window.location.href = url.toString();
+      }
+      
+      function showExportModal() {
+        document.getElementById('exportModal').style.display = 'block';
+      }
+      
+      function closeExportModal() {
+        document.getElementById('exportModal').style.display = 'none';
+      }
+      
+      function selectAllColumns() {
+        document.querySelectorAll('.column-checkbox').forEach(cb => cb.checked = true);
+      }
+      
+      function deselectAllColumns() {
+        document.querySelectorAll('.column-checkbox').forEach(cb => cb.checked = false);
+      }
+      
+      function exportToExcel() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const hideHeaders = document.getElementById('hideHeaders').checked;
+        
+        // Get selected columns
+        const selectedColumns = Array.from(document.querySelectorAll('.column-checkbox:checked'))
+          .map(cb => cb.value);
+        
+        // At least one column must be selected
+        if (selectedColumns.length === 0) {
+          alert('Please select at least one column to export.');
+          return;
+        }
+        
+        let exportUrl = '/admin/export/bookings?';
+        if (startDate) {
+          exportUrl += 'start_date=' + encodeURIComponent(startDate) + '&';
+        }
+        if (endDate) {
+          exportUrl += 'end_date=' + encodeURIComponent(endDate) + '&';
+        }
+        if (hideHeaders) {
+          exportUrl += 'hide_headers=1&';
+        }
+        exportUrl += 'columns=' + encodeURIComponent(selectedColumns.join(','));
+        
+        closeExportModal();
+        window.location.href = exportUrl;
+      }
+      
+      // Close modal when clicking outside of it
+      window.onclick = function(event) {
+        const modal = document.getElementById('exportModal');
+        if (event.target == modal) {
+          closeExportModal();
+        }
+      }
+      
+      // Pagination button event listeners
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.pagination-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            const pageNum = parseInt(this.getAttribute('data-page'));
+            if (!isNaN(pageNum)) {
+              goToPage(pageNum);
+            }
+          });
+        });
+      });
+    </script>
+</body>
+</html>
+

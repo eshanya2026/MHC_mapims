@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Health Checkup - MAPIMS</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}?v=3.3">
+</head>
+<body>
+    <header class="mapims-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                    <div>
+                        <h1 class="mapims-logo">MAPIMS</h1>
+                        <p class="tagline" data-translate="header.tagline">Professional Healthcare Excellence</p>
+                    </div>
+                </div>
+                <div class="header-nav-wrapper">
+                    <div class="header-trust-tag">
+                        <span class="trust-dot"></span>
+                        <span>NABH Accredited Hospital</span>
+                    </div>
+                    <div class="language-switcher">
+                        <button id="languageToggle" class="language-toggle" onclick="toggleLanguage()" title="Switch Language">
+                            <span id="languageIcon">த</span>
+                            <span class="lang-text">தமிழ்</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="booking-main">
+        <div class="container">
+            <!-- Booking Hero Header -->
+            <div class="booking-hero-head">
+                <div class="hero-beacon">✦ Step 3 of 3 • Final Step</div>
+                <h1 class="page-title" data-translate="booking.title">Complete Your Booking</h1>
+                <p class="page-subtitle">Select your preferred date for empty stomach sample collection at our Executive Lounge.</p>
+            </div>
+
+            <!-- Booking 2-Column Grid -->
+            <form id="bookingForm" class="booking-form-wrapper">
+                <div class="booking-layout-grid">
+                    
+                    <!-- Left Column: Scheduling & Preparation -->
+                    <div class="booking-main-col">
+                        
+                        <!-- Card 1: Date Selection -->
+                        <div class="booking-card">
+                            <div class="booking-card-head">
+                                <span class="card-step-badge">1</span>
+                                <div>
+                                    <h2 data-translate="booking.selectDate">Select Appointment Date</h2>
+                                    <p class="card-subtitle">Choose a convenient morning for your hospital visit</p>
+                                </div>
+                            </div>
+
+                            <!-- Quick Date Pills -->
+                            <div class="quick-dates-label">Quick Select:</div>
+                            <div class="quick-dates-bar" id="quickDatesBar">
+                                <button type="button" class="quick-date-chip" onclick="setQuickDate(1, this)">
+                                    <span class="chip-day">Tomorrow</span>
+                                    <span class="chip-date" id="quickDate1">--</span>
+                                </button>
+                                <button type="button" class="quick-date-chip" onclick="setQuickDate(2, this)">
+                                    <span class="chip-day">In 2 Days</span>
+                                    <span class="chip-date" id="quickDate2">--</span>
+                                </button>
+                                <button type="button" class="quick-date-chip" onclick="setUpcomingSaturday(this)">
+                                    <span class="chip-day">This Saturday</span>
+                                    <span class="chip-date" id="quickDateSat">--</span>
+                                </button>
+                                <button type="button" class="quick-date-chip" onclick="setUpcomingMonday(this)">
+                                    <span class="chip-day">Next Monday</span>
+                                    <span class="chip-date" id="quickDateMon">--</span>
+                                </button>
+                            </div>
+
+                            <!-- Standard Date Picker -->
+                            <div class="form-group date-picker-group">
+                                <label for="booking_date">
+                                    <span data-translate="booking.preferredDate">Or Pick a Custom Date</span>
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="date-input-wrap">
+                                    <input type="date" id="booking_date" name="booking_date" required class="modern-date-input">
+                                    <span class="calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Hospital Arrival & Mandatory Fasting Protocol -->
+                        <div class="booking-card protocol-card">
+                            <div class="booking-card-head">
+                                <span class="card-step-badge">2</span>
+                                <div>
+                                    <h2>Arrival & Fasting Protocol</h2>
+                                    <p class="card-subtitle">Essential requirements for accurate test parameters</p>
+                                </div>
+                            </div>
+
+                            <div class="protocol-info-box">
+                                <div class="protocol-row">
+                                    <span class="protocol-icon">⏱️</span>
+                                    <div>
+                                        <strong>Arrival Time: 08:00 AM (Fixed)</strong>
+                                        <p>Early morning sample collection ensures accurate fasting sugar, lipid, and hormone readings.</p>
+                                    </div>
+                                </div>
+                                <div class="protocol-row">
+                                    <span class="protocol-icon">📍</span>
+                                    <div>
+                                        <strong>Reporting Venue:</strong>
+                                        <p>Executive Health Checkup Lounge, Ground Floor, MAPIMS Hospital, Melmaruvathur.</p>
+                                    </div>
+                                </div>
+                                <div class="protocol-row">
+                                    <span class="protocol-icon">🍽️</span>
+                                    <div>
+                                        <strong>10–12 Hours Overnight Fasting:</strong>
+                                        <p>No solid food or milky beverages after 9:00 PM previous night. Water is permitted.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fasting Acknowledgment Checkbox -->
+                            <div class="fasting-ack-wrap">
+                                <label class="fasting-custom-checkbox">
+                                    <input type="checkbox" id="fastingConsentCheckboxInline" required>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="ack-text">
+                                        <strong>I acknowledge and agree to arrive in empty stomach (fasting)</strong> at 8:00 AM on my selected date.
+                                    </span>
+                                </label>
+                                <button type="button" class="btn-link-guidelines" onclick="openFastingModal()">
+                                    <span>Read Full Fasting Instructions ↗</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Free Inclusions Notice -->
+                        <div class="booking-inclusions-banner">
+                            <div class="inc-icon">🎁</div>
+                            <div class="inc-text">
+                                <strong>Complimentary Medical Services Included:</strong>
+                                <span>Zero registration fee, free post-checkup physician consultation & review report included.</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column: Sticky Summary & Confirmation Card -->
+                    <div class="booking-sidebar-col">
+                        <div class="booking-summary-sticky" id="bookingSummarySticky">
+                            
+                            <div class="summary-top-head">
+                                <div class="summary-brand">
+                                    <span class="brand-dot"></span>
+                                    <span>ORDER APPOINTMENT SUMMARY</span>
+                                </div>
+                                <span class="summary-badge">Pay on Visit</span>
+                            </div>
+
+                            <!-- Package Selected Box -->
+                            <div class="summary-package-box">
+                                <div class="pkg-category-tag">Selected Package</div>
+                                <h3 class="package-name-booking" data-package-id="{{ package.id }}" data-original-name="{{ package.name }}">{{ package.name }}</h3>
+                                <div class="pkg-price-row">
+                                    <span class="pkg-currency">₹</span>
+                                    <span class="pkg-price-val">{{ package.price }}</span>
+                                    <span class="pkg-tax-tag">All Inclusive</span>
+                                </div>
+                            </div>
+
+                            <!-- Included Tests Collapsible Preview -->
+                            <div class="summary-tests-preview">
+                                <div class="tests-preview-head" onclick="toggleSummaryTests()">
+                                    <span>{{ package.includes|length }} Tests & Consultations Included</span>
+                                    <span class="toggle-tests-arrow" id="toggleTestsArrow">▼</span>
+                                </div>
+                                <ul class="tests-preview-list" id="summaryTestsList">
+                                    {% for item in package.includes %}
+                                    <li class="test-item-booking {% if loop.index > 5 %}preview-hidden{% endif %}" data-original-text="{{ item }}">
+                                        {{ item }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% if package.includes|length > 5 %}
+                                <div class="summary-tests-more" id="summaryTestsMoreToggle" onclick="toggleSummaryTests()">
+                                    +{{ package.includes|length - 5 }} more tests
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if addons %}
+                            <!-- Additional Addons -->
+                            <div class="summary-addons-box">
+                                <h4 data-translate="booking.additionalTests">Additional Tests</h4>
+                                <ul>
+                                    {% for addon in addons %}
+                                    <li class="addon-item-booking" data-original-text="{{ addon.name }}">
+                                        <span>{{ addon.name }}</span>
+                                        <strong>₹{{ addon.price }}</strong>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <!-- Price Breakdown Table -->
+                            <div class="summary-pricing-table">
+                                <div class="price-row">
+                                    <span data-translate="booking.packagePrice">Package Subtotal:</span>
+                                    <span>₹{{ package.price }}</span>
+                                </div>
+                                {% if addons %}
+                                {% for addon in addons %}
+                                <div class="price-row">
+                                    <span>{{ addon.name }}:</span>
+                                    <span>₹{{ addon.price }}</span>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                                <div class="price-row free-row">
+                                    <span>Doctor Consultation:</span>
+                                    <span class="free-tag">INCLUDED (FREE)</span>
+                                </div>
+                                <div class="price-row free-row">
+                                    <span>Hospital Registration:</span>
+                                    <span class="free-tag">INCLUDED (FREE)</span>
+                                </div>
+                                <div class="price-row total-row">
+                                    <span data-translate="booking.totalAmount">Total Payable at Hospital:</span>
+                                    <span class="grand-total">₹<span id="totalPrice">{{ package.price + (addons|sum(attribute='price') if addons else 0) }}</span></span>
+                                </div>
+                            </div>
+
+                            <p class="payment-disclaimer" data-translate="booking.paymentNote">
+                                💳 No online payment required now. Pay directly at the hospital reception via Cash, Card, or UPI on arrival.
+                            </p>
+
+                            <!-- Confirm Booking Button -->
+                            <button type="submit" class="cta-button btn-confirm-booking" id="confirmBookingBtn">
+                                <span data-translate="booking.confirm">Confirm Booking</span>
+                                <span class="arrow-icon">→</span>
+                            </button>
+
+                            <div class="booking-guarantees">
+                                <span>🔒 100% Confidential</span>
+                                <span>•</span>
+                                <span>⚡ Immediate Confirmation</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- Booking Success Modal -->
+            <div id="successModal" class="success-modal">
+                <div class="success-modal-content">
+                    <div class="success-modal-header">
+                        <h2>Booking Confirmed!</h2>
+                    </div>
+                    <div class="success-modal-body">
+                        <div class="success-icon-small">✓</div>
+                        <h3>Your health checkup has been scheduled successfully!</h3>
+                        <div class="transaction-details">
+                            <p><strong>Appointment Reference:</strong> <span id="transactionId" style="color: var(--mapims-red); font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px;"></span></p>
+                            <p style="margin-top: 12px; color: #475569;">A confirmation SMS and WhatsApp message with fasting instructions has been sent to your phone.</p>
+                        </div>
+                        <div class="success-message">
+                            <p>Please arrive at <strong>8:00 AM on an empty stomach</strong> at the Executive Health Checkup Lounge, MAPIMS Hospital, Melmaruvathur.</p>
+                        </div>
+                    </div>
+                    <div class="success-modal-footer">
+                        <button type="button" class="cta-button" id="successModalButton">View Official Appointment Pass →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fasting Consent Modal -->
+            <div id="fastingModal" class="fasting-modal">
+                <div class="fasting-modal-content">
+                    <div class="fasting-modal-header">
+                        <h2 data-translate="fasting.title">Important: Fasting Instructions</h2>
+                        <button type="button" class="fasting-modal-close" id="fastingModalClose" aria-label="Close" onclick="closeFastingModal()">&times;</button>
+                    </div>
+                    <div class="fasting-modal-body">
+                        <div class="fasting-icon">
+                            <span class="fasting-icon-symbol">🍽️</span>
+                        </div>
+                        <div class="fasting-content">
+                            <h3 data-translate="fasting.subtitle">Come in Empty Stomach for Your Health Checkup</h3>
+                            <div class="fasting-instructions">
+                                <p class="fasting-important" data-translate="fasting.important">Please follow these instructions carefully to ensure accurate test results:</p>
+                                <ul class="fasting-list">
+                                    <li data-translate-html="fasting.instruction0" class="fasting-highlight"></li>
+                                    <li data-translate-html="fasting.instruction1"></li>
+                                    <li data-translate-html="fasting.instruction2"></li>
+                                    <li data-translate-html="fasting.instruction3"></li>
+                                    <li data-translate-html="fasting.instruction4"></li>
+                                    <li data-translate-html="fasting.instruction5"></li>
+                                    <li data-translate-html="fasting.instruction6"></li>
+                                </ul>
+                                <div class="fasting-note">
+                                    <p data-translate-html="fasting.note"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fasting-consent">
+                            <label class="fasting-checkbox-label">
+                                <input type="checkbox" id="fastingConsent" name="fastingConsent">
+                                <span data-translate="fasting.consentText">
+                                    I understand and agree to come in empty stomach (fasting) for my health checkup test at 8:00 AM in the morning to the hospital. I acknowledge that I have read all the instructions above.
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="fasting-modal-footer">
+                        <button type="button" class="cta-button" id="fastingConsentButton" disabled data-translate="fasting.acknowledge">I Understand & Acknowledge</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script>
+        function toggleLanguage() {
+            const newLang = (typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? 'ta' : 'en';
+            if (typeof setLanguage === 'function') {
+                setLanguage(newLang);
+            }
+        }
+        
+        // Function to translate booking page content
+        function translateBookingPage() {
+            const packageNameEl = document.querySelector('.package-name-booking');
+            if (packageNameEl) {
+                const packageId = packageNameEl.getAttribute('data-package-id');
+                if (packageId && typeof getPackageTranslationKey === 'function') {
+                    const transKey = getPackageTranslationKey(packageId);
+                    if (transKey && typeof t === 'function') {
+                        const translated = t(transKey);
+                        if (translated !== transKey) {
+                            packageNameEl.textContent = translated;
+                        }
+                    }
+                }
+            }
+            
+            document.querySelectorAll('.test-item-booking, .addon-item-booking').forEach(element => {
+                const originalText = element.getAttribute('data-original-text');
+                if (originalText && typeof translateTestName === 'function') {
+                    const translated = translateTestName(originalText);
+                    if (translated !== originalText) {
+                        if (element.classList.contains('addon-item-booking')) {
+                            const priceEl = element.querySelector('strong');
+                            const priceText = priceEl ? priceEl.textContent : '';
+                            const spanEl = element.querySelector('span');
+                            if (spanEl) spanEl.textContent = translated;
+                        } else {
+                            element.textContent = translated;
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleSummaryTests() {
+            const hiddenItems = document.querySelectorAll('.test-item-booking.preview-hidden');
+            const arrow = document.getElementById('toggleTestsArrow');
+            const moreToggle = document.getElementById('summaryTestsMoreToggle');
+            
+            if (hiddenItems.length > 0 && hiddenItems[0].style.display === 'list-item') {
+                hiddenItems.forEach(item => item.style.display = 'none');
+                if (arrow) arrow.textContent = '▼';
+                if (moreToggle) moreToggle.textContent = `+${hiddenItems.length} more tests`;
+            } else {
+                hiddenItems.forEach(item => item.style.display = 'list-item');
+                if (arrow) arrow.textContent = '▲';
+                if (moreToggle) moreToggle.textContent = 'Show fewer tests';
+            }
+        }
+
+        function openFastingModal() {
+            const modal = document.getElementById('fastingModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                if (typeof translatePage === 'function') {
+                    setTimeout(translatePage, 50);
+                }
+            }
+        }
+
+        function closeFastingModal() {
+            const modal = document.getElementById('fastingModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+        function formatDisplayDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}`;
+        }
+
+        function formatDateISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function initQuickDates() {
+            const tom = new Date();
+            tom.setDate(tom.getDate() + 1);
+            const in2Days = new Date();
+            in2Days.setDate(in2Days.getDate() + 2);
+
+            const q1 = document.getElementById('quickDate1');
+            const q2 = document.getElementById('quickDate2');
+            if (q1) q1.textContent = formatDisplayDate(tom);
+            if (q2) q2.textContent = formatDisplayDate(in2Days);
+
+            // Saturday
+            const sat = new Date();
+            const dayOfWeek = sat.getDay();
+            const daysToSat = (6 - dayOfWeek + 7) % 7 || 7;
+            sat.setDate(sat.getDate() + daysToSat);
+            const qSat = document.getElementById('quickDateSat');
+            if (qSat) qSat.textContent = formatDisplayDate(sat);
+
+            // Monday
+            const mon = new Date();
+            const daysToMon = (8 - dayOfWeek) % 7 || 7;
+            mon.setDate(mon.getDate() + daysToMon);
+            const qMon = document.getElementById('quickDateMon');
+            if (qMon) qMon.textContent = formatDisplayDate(mon);
+        }
+
+        function setQuickDate(daysOffset, btnEl) {
+            const target = new Date();
+            target.setDate(target.getDate() + daysOffset);
+            applyDateValue(formatDateISO(target), btnEl);
+        }
+
+        function setUpcomingSaturday(btnEl) {
+            const target = new Date();
+            const dayOfWeek = target.getDay();
+            const daysToSat = (6 - dayOfWeek + 7) % 7 || 7;
+            target.setDate(target.getDate() + daysToSat);
+            applyDateValue(formatDateISO(target), btnEl);
+        }
+
+        function setUpcomingMonday(btnEl) {
+            const target = new Date();
+            const dayOfWeek = target.getDay();
+            const daysToMon = (8 - dayOfWeek) % 7 || 7;
+            target.setDate(target.getDate() + daysToMon);
+            applyDateValue(formatDateISO(target), btnEl);
+        }
+
+        function applyDateValue(isoDateStr, btnEl) {
+            const dateInput = document.getElementById('booking_date');
+            if (dateInput) {
+                dateInput.value = isoDateStr;
+                dateInput.dispatchEvent(new Event('change'));
+            }
+            document.querySelectorAll('.quick-date-chip').forEach(c => c.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initQuickDates();
+
+            // Set minimum date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateInput = document.getElementById('booking_date');
+            if (dateInput) {
+                dateInput.min = formatDateISO(tomorrow);
+            }
+            
+            // Fasting Modal Management
+            const fastingModal = document.getElementById('fastingModal');
+            const fastingConsentCheckbox = document.getElementById('fastingConsent');
+            const fastingConsentCheckboxInline = document.getElementById('fastingConsentCheckboxInline');
+            const fastingConsentButton = document.getElementById('fastingConsentButton');
+            let fastingConsentGiven = false;
+
+            // Sync inline checkbox with modal
+            if (fastingConsentCheckboxInline) {
+                fastingConsentCheckboxInline.addEventListener('change', function() {
+                    if (this.checked) {
+                        fastingConsentGiven = true;
+                        if (fastingConsentCheckbox) fastingConsentCheckbox.checked = true;
+                    } else {
+                        fastingConsentGiven = false;
+                        if (fastingConsentCheckbox) fastingConsentCheckbox.checked = false;
+                    }
+                });
+            }
+            
+            // Show modal when date is selected if not acknowledged
+            if (dateInput) {
+                dateInput.addEventListener('change', function() {
+                    if (this.value && !fastingConsentGiven) {
+                        openFastingModal();
+                    }
+                });
+            }
+            
+            if (fastingConsentCheckbox) {
+                fastingConsentCheckbox.addEventListener('change', function() {
+                    if (fastingConsentButton) {
+                        fastingConsentButton.disabled = !this.checked;
+                    }
+                });
+            }
+            
+            if (fastingConsentButton) {
+                fastingConsentButton.addEventListener('click', function() {
+                    if (fastingConsentCheckbox && fastingConsentCheckbox.checked) {
+                        fastingConsentGiven = true;
+                        if (fastingConsentCheckboxInline) fastingConsentCheckboxInline.checked = true;
+                        closeFastingModal();
+                    }
+                });
+            }
+            
+            // Close modal when clicking outside
+            if (fastingModal) {
+                fastingModal.addEventListener('click', function(e) {
+                    if (e.target === fastingModal) {
+                        closeFastingModal();
+                    }
+                });
+            }
+            
+            // Translate booking page on load
+            setTimeout(() => {
+                translateBookingPage();
+                if (typeof translatePage === 'function') {
+                    translatePage();
+                }
+            }, 100);
+            
+            // Handle Language Switch
+            const originalToggleLanguage = window.toggleLanguage;
+            if (typeof originalToggleLanguage === 'function') {
+                window.toggleLanguage = function() {
+                    originalToggleLanguage();
+                    setTimeout(() => {
+                        translateBookingPage();
+                        if (typeof translatePage === 'function') {
+                            translatePage();
+                        }
+                    }, 100);
+                };
+            }
+
+            // Booking Form Submission
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const bookingDate = document.getElementById('booking_date').value;
+                if (!bookingDate) {
+                    alert('Please select a booking date');
+                    document.getElementById('booking_date').focus();
+                    return;
+                }
+                
+                let addons = [];
+                {% if addons and addons|length > 0 %}
+                addons = {{ addons|tojson|safe }};
+                {% else %}
+                addons = [];
+                {% endif %}
+                if (!Array.isArray(addons)) addons = [];
+                
+                const packagePrice = {{ package.price|default(0) }};
+                const addonTotal = addons.reduce(function(sum, a) {
+                    return sum + (parseInt(a.price) || 0);
+                }, 0);
+                const totalPrice = packagePrice + addonTotal;
+                
+                // Validate fasting consent
+                if (!fastingConsentGiven && (!fastingConsentCheckboxInline || !fastingConsentCheckboxInline.checked)) {
+                    alert('Please acknowledge the fasting instructions before proceeding with booking.');
+                    openFastingModal();
+                    return;
+                }
+                
+                const formData = {
+                    package_id: '{{ package.id|default("")|e }}',
+                    package_name: '{{ package.name|default("")|e }}',
+                    package_price: packagePrice,
+                    addons: addons,
+                    total_price: totalPrice,
+                    booking_date: bookingDate,
+                    booking_time: '08:00',
+                    sample_type: 'hospital',
+                    address: '',
+                    fasting_consent: true
+                };
+
+                const submitButton = document.getElementById('confirmBookingBtn') || document.querySelector('button[type="submit"]');
+                const originalHtml = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span>Processing Booking...</span>';
+
+                fetch('/api/create-booking', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                })
+                .then(r => {
+                    if (!r.ok) throw new Error('Network response was not ok');
+                    return r.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        if (typeof fbq !== 'undefined') {
+                            fbq('track', 'Purchase', {value: totalPrice, currency: 'INR'});
+                        }
+                        const successModal = document.getElementById('successModal');
+                        const transactionIdElement = document.getElementById('transactionId');
+                        if (successModal && transactionIdElement) {
+                            transactionIdElement.textContent = data.booking_reference || 'N/A';
+                            successModal.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
+                            
+                            const successButton = document.getElementById('successModalButton');
+                            if (successButton) {
+                                successButton.onclick = function() {
+                                    window.location.href = "{{ url_for('confirmation') }}";
+                                };
+                            }
+                            
+                            setTimeout(function() {
+                                window.location.href = "{{ url_for('confirmation') }}";
+                            }, 3500);
+                        } else {
+                            window.location.href = "{{ url_for('confirmation') }}";
+                        }
+                    } else {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalHtml;
+                        alert('Error: ' + (data.error || 'Failed to create booking'));
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalHtml;
+                    alert('Network error. Please try again. Error: ' + err.message);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - MAPIMS</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}">
+</head>
+<body class="admin-body">
+    <div class="admin-login-container">
+        <div class="admin-login-card">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                <div>
+                    <h1 class="mapims-logo">MAPIMS</h1>
+                    <p class="tagline">Admin Portal</p>
+                </div>
+            </div>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="cta-button">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('/admin/authenticate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    alert('Invalid credentials');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

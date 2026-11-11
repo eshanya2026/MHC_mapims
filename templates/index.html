@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAPIMS Health Checkup - Personalized Health Assessment</title>
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='favicon_io/favicon.ico') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}"
+    />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="logo">
+          <img
+            src="{{ url_for('static', filename='images/logo.png') }}"
+            alt="MAPIMS Logo"
+            class="logo-image"
+          />
+          <div>
+            <h1>MAPIMS</h1>
+            <p class="tagline">Your Health, Our Priority</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="welcome-section">
+          <h2>Personalized Health Checkup Recommendation</h2>
+          <p class="subtitle">
+            Get an AI-powered recommendation for the perfect health checkup
+            package based on your profile
+          </p>
+        </div>
+
+        <div class="form-container">
+          <form id="patientForm" class="patient-form">
+            <div class="form-section">
+              <h3>Personal Information</h3>
+
+              <div class="form-group">
+                <label for="name"
+                  >Full Name <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Enter your full name"
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="age">Age <span class="required">*</span></label>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    required
+                    min="1"
+                    max="120"
+                    placeholder="Years"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="gender">Gender</label>
+                  <select id="gender" name="gender">
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="weight"
+                    >Weight <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    id="weight"
+                    name="weight"
+                    required
+                    min="1"
+                    max="500"
+                    step="0.1"
+                    placeholder="kg"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="height"
+                    >Height <span class="required">*</span></label
+                  >
+                  <input
+                    type="number"
+                    id="height"
+                    name="height"
+                    required
+                    min="50"
+                    max="300"
+                    step="0.1"
+                    placeholder="cm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Contact Information</h3>
+
+              <div class="form-group">
+                <label for="phone"
+                  >Phone Number <span class="required">*</span>
+                  <span
+                    style="
+                      display: inline-block;
+                      margin-left: 8px;
+                      vertical-align: middle;
+                    "
+                  >
+                    <img
+                      src="{{ url_for('static', filename='images/whatsapp.png') }}"
+                      alt="WhatsApp"
+                      style="
+                        display: inline-block;
+                        vertical-align: middle;
+                        width: 22px;
+                        height: 22px;
+                        object-fit: contain;
+                      "
+                    />
+                  </span>
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  placeholder="+91 1234567890"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Health Information (Optional)</h3>
+
+              <div class="form-group">
+                <label for="symptoms">Current Symptoms (if any)</label>
+                <textarea
+                  id="symptoms"
+                  name="symptoms"
+                  rows="3"
+                  placeholder="e.g., frequent headaches, fatigue, chest pain..."
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="existing_conditions"
+                  >Existing Health Conditions (if any)</label
+                >
+                <textarea
+                  id="existing_conditions"
+                  name="existing_conditions"
+                  rows="3"
+                  placeholder="e.g., diabetes, hypertension, asthma..."
+                ></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <span class="btn-text">Get My Health Checkup Recommendation</span>
+              <span class="btn-loader" style="display: none"
+                >Processing...</span
+              >
+            </button>
+          </form>
+        </div>
+
+        <div
+          id="recommendationResult"
+          class="recommendation-result"
+          style="display: none"
+        >
+          <div class="result-header">
+            <h3>Your Recommended Health Checkup Package</h3>
+          </div>
+          <div class="package-card" id="packageCard">
+            <!-- Package details will be inserted here -->
+          </div>
+          <div class="reasoning-box" id="reasoningBox">
+            <!-- Reasoning will be inserted here -->
+          </div>
+          <button class="btn-secondary" onclick="resetForm()">
+            Get Another Recommendation
+          </button>
+        </div>
+
+        <div
+          id="errorMessage"
+          class="error-message"
+          style="display: none"
+        ></div>
+      </main>
+
+      <footer class="footer">
+        <p>
+          &copy; 2025 MAPIMS. All rights reserved. |
+          <a href="https://mapims.org" target="_blank">mapims.org</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads - MAPIMS Admin</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="container">
+            <div class="admin-header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                    <div>
+                        <h1 class="mapims-logo">MAPIMS</h1>
+                        <p class="tagline">Admin Portal</p>
+                    </div>
+                </div>
+                <nav class="admin-nav">
+                    <a href="/admin/dashboard">Dashboard</a>
+                    <a href="/admin/leads">Leads</a>
+                    <a href="/admin/bookings">Bookings</a>
+                    <a href="/admin/logout">Logout</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="container">
+            <h1 class="admin-page-title">All Leads / Patients</h1>
+            
+            <!-- Date Filter -->
+            <div class="filter-controls" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <label for="start_date" style="font-weight: 600;">From:</label>
+              <input type="date" id="start_date" name="start_date" value="{{ start_date }}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+              <label for="end_date" style="font-weight: 600;">To:</label>
+              <input type="date" id="end_date" name="end_date" value="{{ end_date }}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px;">
+              <button onclick="applyFilters()" style="padding: 8px 16px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Filter</button>
+              <button onclick="clearFilters()" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Clear</button>
+              <button onclick="showExportModal()" style="padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Export Excel
+              </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>BMI</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Risk Score</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ ((page - 1) * per_page) + loop.index }}</td>
+                            <td>{{ patient.name }}</td>
+                            <td>{{ patient.age }}</td>
+                            <td>{{ patient.gender }}</td>
+                            <td>{{ patient.bmi }} ({{ patient.bmi_category }})</td>
+                            <td>{{ patient.phone }}</td>
+                            <td>{{ patient.email }}</td>
+                            <td><span class="risk-badge">{{ patient.ai_analysis.risk_score if patient.ai_analysis else 'N/A' }}</span></td>
+                            <td>{% if patient.submitted_at %}{{ patient.submitted_at.strftime('%Y-%m-%d %H:%M') }}{% else %}N/A{% endif %}</td>
+                            <td><span class="status-badge">{{ patient.status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-controls" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>Showing {{ ((page - 1) * per_page) + 1 }} to {{ ((page - 1) * per_page) + patients|length }} of {{ total_patients_count }} entries</span>
+                <select id="per_page" onchange="changePerPage()" style="padding: 6px; border: 2px solid #ddd; border-radius: 4px;">
+                  <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                  <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                  <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                  <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 5px;">
+                {% if page > 1 %}
+                <button onclick="goToPage({{ page - 1 }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Previous</button>
+                {% endif %}
+                {% for p in range(1, total_pages + 1) %}
+                  {% if p == page %}
+                  <button style="padding: 8px 12px; background: #B8142C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">{{ p }}</button>
+                  {% elif p <= 3 or p > total_pages - 3 or (p >= page - 1 and p <= page + 1) %}
+                  <button onclick="goToPage({{ p }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">{{ p }}</button>
+                  {% elif p == 4 or p == total_pages - 3 %}
+                  <span style="padding: 8px;">...</span>
+                  {% endif %}
+                {% endfor %}
+                {% if page < total_pages %}
+                <button onclick="goToPage({{ page + 1 }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Next</button>
+                {% endif %}
+              </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Export Modal -->
+    <div id="exportModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div style="background-color: #fefefe; margin: 5% auto; padding: 30px; border: 1px solid #888; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #E31837; font-size: 1.5rem;">Export to Excel</h2>
+                <span onclick="closeExportModal()" style="color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h3 style="margin-bottom: 15px; color: #333; font-size: 1.1rem;">Select Columns to Export:</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="sno" checked style="cursor: pointer;">
+                        <span>S.No</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="name" checked style="cursor: pointer;">
+                        <span>Name</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="age" checked style="cursor: pointer;">
+                        <span>Age</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="gender" checked style="cursor: pointer;">
+                        <span>Gender</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="phone" checked style="cursor: pointer;">
+                        <span>Phone</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="email" checked style="cursor: pointer;">
+                        <span>Email</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="bmi" checked style="cursor: pointer;">
+                        <span>BMI</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="bmi_category" checked style="cursor: pointer;">
+                        <span>BMI Category</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="risk_score" checked style="cursor: pointer;">
+                        <span>Risk Score</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="submitted_date" checked style="cursor: pointer;">
+                        <span>Submitted Date</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;">
+                        <input type="checkbox" class="column-checkbox" value="status" checked style="cursor: pointer;">
+                        <span>Status</span>
+                    </label>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button onclick="selectAllColumns()" style="padding: 6px 12px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Select All</button>
+                    <button onclick="deselectAllColumns()" style="padding: 6px 12px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Deselect All</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="hideHeaders" style="cursor: pointer; width: 18px; height: 18px;">
+                    <span style="font-weight: 600; color: #333;">Hide Column Headers in Excel</span>
+                </label>
+                <p style="margin: 8px 0 0 28px; color: #666; font-size: 0.9rem;">If checked, the header row will be hidden in the exported Excel file.</p>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="closeExportModal()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Cancel</button>
+                <button onclick="exportToExcel()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Export</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+      function applyFilters() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const perPage = document.getElementById('per_page') ? document.getElementById('per_page').value : '{{ per_page }}';
+        const url = new URL(window.location.href);
+        url.searchParams.set('start_date', startDate);
+        url.searchParams.set('end_date', endDate);
+        url.searchParams.set('page', '1');
+        url.searchParams.set('per_page', perPage);
+        window.location.href = url.toString();
+      }
+      
+      function clearFilters() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('start_date');
+        url.searchParams.delete('end_date');
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+      }
+      
+      function goToPage(page) {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const perPage = document.getElementById('per_page') ? document.getElementById('per_page').value : '{{ per_page }}';
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        url.searchParams.set('start_date', startDate);
+        url.searchParams.set('end_date', endDate);
+        url.searchParams.set('per_page', perPage);
+        window.location.href = url.toString();
+      }
+      
+      function changePerPage() {
+        const perPage = document.getElementById('per_page').value;
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.set('page', '1');
+        url.searchParams.set('start_date', startDate);
+        url.searchParams.set('end_date', endDate);
+        window.location.href = url.toString();
+      }
+      
+      function showExportModal() {
+        document.getElementById('exportModal').style.display = 'block';
+      }
+      
+      function closeExportModal() {
+        document.getElementById('exportModal').style.display = 'none';
+      }
+      
+      function selectAllColumns() {
+        document.querySelectorAll('.column-checkbox').forEach(cb => cb.checked = true);
+      }
+      
+      function deselectAllColumns() {
+        document.querySelectorAll('.column-checkbox').forEach(cb => cb.checked = false);
+      }
+      
+      function exportToExcel() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const hideHeaders = document.getElementById('hideHeaders').checked;
+        
+        // Get selected columns
+        const selectedColumns = Array.from(document.querySelectorAll('.column-checkbox:checked'))
+          .map(cb => cb.value);
+        
+        // At least one column must be selected
+        if (selectedColumns.length === 0) {
+          alert('Please select at least one column to export.');
+          return;
+        }
+        
+        let exportUrl = '/admin/export/leads?';
+        if (startDate) {
+          exportUrl += 'start_date=' + encodeURIComponent(startDate) + '&';
+        }
+        if (endDate) {
+          exportUrl += 'end_date=' + encodeURIComponent(endDate) + '&';
+        }
+        if (hideHeaders) {
+          exportUrl += 'hide_headers=1&';
+        }
+        exportUrl += 'columns=' + encodeURIComponent(selectedColumns.join(','));
+        
+        closeExportModal();
+        window.location.href = exportUrl;
+      }
+      
+      // Close modal when clicking outside of it
+      window.onclick = function(event) {
+        const modal = document.getElementById('exportModal');
+        if (event.target == modal) {
+          closeExportModal();
+        }
+      }
+    </script>
+</body>
+</html>
+

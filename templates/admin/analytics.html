@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - MAPIMS Admin</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon_io/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapims.css') }}">
+    <style>
+        .analytics-main {
+            padding: 40px 0;
+            background: var(--mapims-light-grey);
+        }
+        
+        .analytics-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .chart-container {
+            background: var(--mapims-white);
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--mapims-grey);
+            margin-bottom: 32px;
+        }
+        
+        .chart-container h3 {
+            color: var(--mapims-red);
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .metric-card {
+            background: var(--mapims-white);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border-top: 4px solid var(--mapims-red);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--mapims-red);
+            margin-bottom: 8px;
+        }
+        
+        .metric-label {
+            color: var(--mapims-text-light);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .analytics-section {
+            background: var(--mapims-white);
+            padding: 36px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--mapims-grey);
+        }
+        
+        .analytics-section h2 {
+            color: var(--mapims-red);
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th {
+            background: var(--mapims-red-gradient);
+            color: var(--mapims-white);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--mapims-grey);
+            font-size: 0.95rem;
+        }
+        
+        .data-table tr:hover {
+            background: var(--mapims-light-grey);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filter-controls select,
+        .filter-controls input {
+            padding: 10px 16px;
+            border: 2px solid var(--mapims-grey);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .filter-controls select:focus,
+        .filter-controls input:focus {
+            outline: none;
+            border-color: var(--mapims-red);
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <div class="container">
+            <div class="admin-header-content">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="logo-image">
+                    <div>
+                        <h1 class="mapims-logo">MAPIMS</h1>
+                        <p class="tagline">Analytics Dashboard</p>
+                    </div>
+                </div>
+                <nav class="admin-nav">
+                    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('admin_leads') }}">Leads</a>
+                    <a href="{{ url_for('admin_bookings') }}">Bookings</a>
+                    <a href="{{ url_for('admin_analytics') }}" style="background: rgba(255,255,255,0.2);">Analytics</a>
+                    <a href="{{ url_for('admin_logout') }}">Logout</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="analytics-main">
+        <div class="container">
+            <div class="analytics-header">
+                <h1 class="admin-page-title">Analytics & Insights</h1>
+                <p style="color: var(--mapims-text-light); margin-top: 8px;">Comprehensive analytics and data insights</p>
+                
+                <!-- Global Date Filter -->
+                <div class="filter-controls" style="margin-top: 20px; justify-content: center;">
+                  <label for="global_start_date" style="font-weight: 600; margin-right: 10px;">From:</label>
+                  <input type="date" id="global_start_date" name="global_start_date" value="{{ start_date }}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px; margin-right: 10px;">
+                  <label for="global_end_date" style="font-weight: 600; margin-right: 10px;">To:</label>
+                  <input type="date" id="global_end_date" name="global_end_date" value="{{ end_date }}" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px; margin-right: 10px;">
+                  <button onclick="applyGlobalFilters()" style="padding: 8px 16px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; margin-right: 10px;">Apply Filter</button>
+                  <button onclick="clearGlobalFilters()" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Clear</button>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_patients }}</div>
+                    <div class="metric-label">Total Patients</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_bookings }}</div>
+                    <div class="metric-label">Total Bookings</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ confirmed_bookings }}</div>
+                    <div class="metric-label">Confirmed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ total_revenue }}</div>
+                    <div class="metric-label">Total Revenue (₹)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ avg_risk_score }}</div>
+                    <div class="metric-label">Avg Risk Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ conversion_rate }}%</div>
+                    <div class="metric-label">Conversion Rate</div>
+                </div>
+            </div>
+
+            <!-- Package Distribution Chart -->
+            <div class="chart-container">
+                <h3>Package Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="packageChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Risk Score Distribution Chart -->
+            <div class="chart-container">
+                <h3>Health Risk Score Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="riskChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Age Distribution Chart -->
+            <div class="chart-container">
+                <h3>Patient Age Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="ageChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue Trend Chart -->
+            <div class="chart-container">
+                <h3>Revenue Trend (Last 30 Days)</h3>
+                <div class="chart-wrapper">
+                    <canvas id="revenueChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Booking Status Distribution Chart -->
+            <div class="chart-container">
+                <h3>Booking Status Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="bookingStatusChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue by Package Chart -->
+            <div class="chart-container">
+                <h3>Revenue by Package</h3>
+                <div class="chart-wrapper">
+                    <canvas id="revenueByPackageChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Risk Factors -->
+            <div class="analytics-section">
+                <h2>Top Health Risk Factors</h2>
+                
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Risk Factor</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for factor in top_risk_factors %}
+                            <tr>
+                                <td>{{ ((risk_page - 1) * per_page) + loop.index }}</td>
+                                <td>{{ factor.name }}</td>
+                                <td>{{ factor.count }}</td>
+                                <td>{{ factor.percentage }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination for Risk Factors -->
+                <div class="pagination-controls" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>Showing {{ ((risk_page - 1) * per_page) + 1 }} to {{ ((risk_page - 1) * per_page) + top_risk_factors|length }} of {{ total_risk_factors }} entries</span>
+                    <select id="risk_per_page" onchange="changeRiskPerPage()" style="padding: 6px; border: 2px solid #ddd; border-radius: 4px;">
+                      <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                      <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                      <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                      <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                    </select>
+                  </div>
+                  <div style="display: flex; gap: 5px;">
+                    {% if risk_page > 1 %}
+                    <button onclick="goToRiskPage({{ risk_page - 1 }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Previous</button>
+                    {% endif %}
+                    {% for p in range(1, total_risk_pages + 1) %}
+                      {% if p == risk_page %}
+                      <button style="padding: 8px 12px; background: #B8142C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">{{ p }}</button>
+                      {% elif p <= 3 or p > total_risk_pages - 3 or (p >= risk_page - 1 and p <= risk_page + 1) %}
+                      <button onclick="goToRiskPage({{ p }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">{{ p }}</button>
+                      {% elif p == 4 or p == total_risk_pages - 3 %}
+                      <span style="padding: 8px;">...</span>
+                      {% endif %}
+                    {% endfor %}
+                    {% if risk_page < total_risk_pages %}
+                    <button onclick="goToRiskPage({{ risk_page + 1 }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Next</button>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
+
+            <!-- Package Performance -->
+            <div class="analytics-section">
+                <h2>Package Performance</h2>
+                
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Package</th>
+                                <th>Bookings</th>
+                                <th>Revenue</th>
+                                <th>Avg Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for package in package_performance %}
+                            <tr>
+                                <td>{{ ((package_page - 1) * per_page) + loop.index }}</td>
+                                <td>{{ package.name }}</td>
+                                <td>{{ package.bookings }}</td>
+                                <td>₹{{ package.revenue }}</td>
+                                <td>₹{{ package.avg_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination for Package Performance -->
+                <div class="pagination-controls" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>Showing {{ ((package_page - 1) * per_page) + 1 }} to {{ ((package_page - 1) * per_page) + package_performance|length }} of {{ total_packages }} entries</span>
+                    <select id="package_per_page" onchange="changePackagePerPage()" style="padding: 6px; border: 2px solid #ddd; border-radius: 4px;">
+                      <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                      <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                      <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                      <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                    </select>
+                  </div>
+                  <div style="display: flex; gap: 5px;">
+                    {% if package_page > 1 %}
+                    <button onclick="goToPackagePage({{ package_page - 1 }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Previous</button>
+                    {% endif %}
+                    {% for p in range(1, total_package_pages + 1) %}
+                      {% if p == package_page %}
+                      <button style="padding: 8px 12px; background: #B8142C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">{{ p }}</button>
+                      {% elif p <= 3 or p > total_package_pages - 3 or (p >= package_page - 1 and p <= package_page + 1) %}
+                      <button onclick="goToPackagePage({{ p }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">{{ p }}</button>
+                      {% elif p == 4 or p == total_package_pages - 3 %}
+                      <span style="padding: 8px;">...</span>
+                      {% endif %}
+                    {% endfor %}
+                    {% if package_page < total_package_pages %}
+                    <button onclick="goToPackagePage({{ package_page + 1 }})" style="padding: 8px 12px; background: #E31837; color: white; border: none; border-radius: 4px; cursor: pointer;">Next</button>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
+
+            <!-- Monthly Trends -->
+            <div class="analytics-section">
+                <h2>Monthly Trends</h2>
+                <div class="chart-wrapper" style="height: 400px;">
+                    <canvas id="monthlyTrendChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load Chart.js before initializing charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js" 
+            onerror="console.error('Failed to load Chart.js from CDN'); 
+                     var script = document.createElement('script');
+                     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js';
+                     document.head.appendChild(script);"></script>
+    <script>
+        // Wait for Chart.js and DOM to be fully loaded
+        function initializeCharts() {
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.log('Waiting for Chart.js to load...');
+                setTimeout(initializeCharts, 100);
+                return;
+            }
+            
+            console.log('Chart.js loaded, initializing charts...');
+            
+            // Chart color palette
+            const chartColors = {
+                primary: '#E31837',
+                secondary: '#B8142C',
+                tertiary: '#F04A5F',
+                quaternary: '#FF6B7A',
+                quinary: '#FF8A95',
+                senary: '#FFA8B0'
+            };
+
+            // Helper function to safely get JSON data
+            function getData(jsonData, defaultValue) {
+                try {
+                    if (jsonData === undefined || jsonData === null) {
+                        return defaultValue;
+                    }
+                    return Array.isArray(jsonData) ? jsonData : defaultValue;
+                } catch (e) {
+                    console.error('Error parsing data:', e);
+                    return defaultValue;
+                }
+            }
+
+            // Package Distribution Chart
+            try {
+                const packageCtx = document.getElementById('packageChart');
+                if (!packageCtx) {
+                    console.error('Package chart canvas not found');
+                } else {
+                    const packageLabels = getData({{ package_labels|tojson }}, []);
+                    const packageData = getData({{ package_data|tojson }}, []);
+                    
+                    console.log('Package chart data:', { labels: packageLabels, data: packageData });
+                    
+                    // Ensure we have valid data arrays - always show something
+                    let labels = packageLabels.length > 0 ? packageLabels : ['No Packages Yet'];
+                    let data = packageData.length > 0 ? packageData : [100];
+                    
+                    // Ensure we have enough colors
+                    const colors = [
+                        chartColors.primary,
+                        chartColors.secondary,
+                        chartColors.tertiary,
+                        chartColors.quaternary,
+                        chartColors.quinary,
+                        chartColors.senary
+                    ];
+                    const bgColors = labels.map((_, i) => colors[i % colors.length]);
+                    
+                    new Chart(packageCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: bgColors,
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            padding: 15,
+                                            font: {
+                                                size: 12
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                const label = context.label || '';
+                                                const value = context.parsed || 0;
+                                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                const percentage = ((value / total) * 100).toFixed(1);
+                                                return `${label}: ${value} (${percentage}%)`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Package chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating package chart:', error);
+                const packageCtx = document.getElementById('packageChart');
+                if (packageCtx && packageCtx.parentElement) {
+                    packageCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+
+            // Risk Score Distribution Chart
+            try {
+                const riskCtx = document.getElementById('riskChart');
+                if (!riskCtx) {
+                    console.error('Risk chart canvas not found');
+                } else {
+                    const riskLabels = getData({{ risk_labels|tojson }}, ['Low', 'Moderate', 'High', 'Critical']);
+                    const riskData = getData({{ risk_data|tojson }}, [0, 0, 0, 0]);
+                    
+                    console.log('Risk chart data:', { labels: riskLabels, data: riskData });
+                    
+                    new Chart(riskCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: riskLabels,
+                            datasets: [{
+                                label: 'Number of Patients',
+                                data: riskData,
+                                    backgroundColor: [
+                                        '#4CAF50',  // Low - Green
+                                        '#FFC107',  // Moderate - Yellow
+                                        '#FF9800',  // High - Orange
+                                        chartColors.primary  // Critical - Red
+                                    ],
+                                    borderColor: chartColors.secondary,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `${context.parsed.y} patients`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Risk chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating risk chart:', error);
+                const riskCtx = document.getElementById('riskChart');
+                if (riskCtx && riskCtx.parentElement) {
+                    riskCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+
+            // Age Distribution Chart
+            try {
+                const ageCtx = document.getElementById('ageChart');
+                if (!ageCtx) {
+                    console.error('Age chart canvas not found');
+                } else {
+                    const ageLabels = getData({{ age_labels|tojson }}, ['0-20', '21-30', '31-40', '41-50', '51-60', '60+']);
+                    const ageData = getData({{ age_data|tojson }}, [0, 0, 0, 0, 0, 0]);
+                    
+                    console.log('Age chart data:', { labels: ageLabels, data: ageData });
+                    
+                    new Chart(ageCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ageLabels,
+                            datasets: [{
+                                label: 'Number of Patients',
+                                data: ageData,
+                                    borderColor: chartColors.primary,
+                                    backgroundColor: 'rgba(227, 24, 55, 0.6)',
+                                    borderWidth: 2,
+                                    fill: false
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `${context.parsed.y} patients`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Age chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating age chart:', error);
+                const ageCtx = document.getElementById('ageChart');
+                if (ageCtx && ageCtx.parentElement) {
+                    ageCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+
+            // Revenue Trend Chart
+            try {
+                const revenueCtx = document.getElementById('revenueChart');
+                if (!revenueCtx) {
+                    console.error('Revenue chart canvas not found');
+                } else {
+                    let revenueLabels = getData({{ revenue_labels|tojson }}, []);
+                    let revenueData = getData({{ revenue_data|tojson }}, []);
+                    
+                    // Generate default labels if empty (last 30 days)
+                    if (revenueLabels.length === 0) {
+                        revenueLabels = [];
+                        revenueData = [];
+                        for (let i = 29; i >= 0; i--) {
+                            const date = new Date();
+                            date.setDate(date.getDate() - i);
+                            revenueLabels.push(date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }));
+                            revenueData.push(0);
+                        }
+                    }
+                    
+                    console.log('Revenue chart data:', { labels: revenueLabels.length, data: revenueData.length });
+                    
+                    new Chart(revenueCtx.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: revenueLabels,
+                            datasets: [{
+                                label: 'Revenue (₹)',
+                                data: revenueData,
+                                    borderColor: chartColors.primary,
+                                    backgroundColor: 'rgba(227, 24, 55, 0.1)',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    pointBackgroundColor: chartColors.primary,
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `Revenue: ₹${context.parsed.y.toLocaleString('en-IN')}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return '₹' + value.toLocaleString('en-IN');
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Revenue chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating revenue chart:', error);
+                const revenueCtx = document.getElementById('revenueChart');
+                if (revenueCtx && revenueCtx.parentElement) {
+                    revenueCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+
+            // Monthly Trends Chart
+            try {
+                const monthlyCtx = document.getElementById('monthlyTrendChart');
+                if (!monthlyCtx) {
+                    console.error('Monthly trends chart canvas not found');
+                } else {
+                    let monthlyLabels = getData({{ monthly_labels|tojson }}, []);
+                    let monthlyPatients = getData({{ monthly_patients|tojson }}, []);
+                    let monthlyBookings = getData({{ monthly_bookings|tojson }}, []);
+                    
+                    // Generate default labels if empty (last 6 months)
+                    if (monthlyLabels.length === 0) {
+                        monthlyLabels = [];
+                        monthlyPatients = [];
+                        monthlyBookings = [];
+                        for (let i = 5; i >= 0; i--) {
+                            const date = new Date();
+                            date.setMonth(date.getMonth() - i);
+                            monthlyLabels.push(date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }));
+                            monthlyPatients.push(0);
+                            monthlyBookings.push(0);
+                        }
+                    }
+                    
+                    console.log('Monthly trends chart data:', { labels: monthlyLabels.length, patients: monthlyPatients.length, bookings: monthlyBookings.length });
+                    
+                    new Chart(monthlyCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: monthlyLabels,
+                            datasets: [
+                                {
+                                    label: 'Patients',
+                                    data: monthlyPatients,
+                                    backgroundColor: chartColors.primary,
+                                    borderColor: chartColors.secondary,
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Bookings',
+                                    data: monthlyBookings,
+                                        backgroundColor: chartColors.tertiary,
+                                        borderColor: chartColors.secondary,
+                                        borderWidth: 1
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `${context.dataset.label}: ${context.parsed.y}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Monthly trends chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating monthly trends chart:', error);
+                const monthlyCtx = document.getElementById('monthlyTrendChart');
+                if (monthlyCtx && monthlyCtx.parentElement) {
+                    monthlyCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+
+            // Booking Status Distribution Chart
+            try {
+                const bookingStatusCtx = document.getElementById('bookingStatusChart');
+                if (!bookingStatusCtx) {
+                    console.error('Booking status chart canvas not found');
+                } else {
+                    const bookingStatusLabels = getData({{ booking_status_labels|tojson }}, ['Confirmed', 'Pending', 'Cancelled', 'Completed']);
+                    const bookingStatusData = getData({{ booking_status_data|tojson }}, [0, 0, 0, 0]);
+                    
+                    console.log('Booking status chart data:', { labels: bookingStatusLabels, data: bookingStatusData });
+                    
+                    new Chart(bookingStatusCtx.getContext('2d'), {
+                        type: 'pie',
+                        data: {
+                            labels: bookingStatusLabels,
+                            datasets: [{
+                                data: bookingStatusData,
+                                    backgroundColor: [
+                                        '#4CAF50',  // Confirmed - Green
+                                        '#FFC107',  // Pending - Yellow
+                                        '#F44336',  // Cancelled - Red
+                                        '#2196F3'   // Completed - Blue
+                                    ],
+                                    borderColor: '#fff',
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            padding: 15,
+                                            font: {
+                                                size: 12
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                const label = context.label || '';
+                                                const value = context.parsed || 0;
+                                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                                return `${label}: ${value} (${percentage}%)`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Booking status chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating booking status chart:', error);
+                const bookingStatusCtx = document.getElementById('bookingStatusChart');
+                if (bookingStatusCtx && bookingStatusCtx.parentElement) {
+                    bookingStatusCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+
+            // Revenue by Package Chart
+            try {
+                const revenueByPackageCtx = document.getElementById('revenueByPackageChart');
+                if (!revenueByPackageCtx) {
+                    console.error('Revenue by package chart canvas not found');
+                } else {
+                    const revenueByPackageLabels = getData({{ revenue_by_package_labels|tojson }}, []);
+                    const revenueByPackageData = getData({{ revenue_by_package_data|tojson }}, []);
+                    
+                    // Always show chart, even if empty
+                    const labels = revenueByPackageLabels.length > 0 ? revenueByPackageLabels : ['No Packages Yet'];
+                    const data = revenueByPackageData.length > 0 ? revenueByPackageData : [0];
+                    
+                    console.log('Revenue by package chart data:', { labels: labels, data: data });
+                    
+                    new Chart(revenueByPackageCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Revenue (₹)',
+                                data: data,
+                                    backgroundColor: chartColors.primary,
+                                    borderColor: chartColors.secondary,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                indexAxis: 'y',  // Horizontal bar chart
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `Revenue: ₹${context.parsed.x.toLocaleString('en-IN')}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return '₹' + value.toLocaleString('en-IN');
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                }
+                    console.log('Revenue by package chart created successfully');
+                }
+            } catch (error) {
+                console.error('Error creating revenue by package chart:', error);
+                const revenueByPackageCtx = document.getElementById('revenueByPackageChart');
+                if (revenueByPackageCtx && revenueByPackageCtx.parentElement) {
+                    revenueByPackageCtx.parentElement.innerHTML = '<div style="text-align: center; color: #999; padding: 50px;"><p>Error loading chart</p><p style="font-size: 0.8em;">' + error.message + '</p></div>';
+                }
+            }
+            
+            console.log('All charts initialization completed');
+        }
+
+        // Initialize charts when DOM and Chart.js are ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initializeCharts, 100);
+            });
+        } else {
+            setTimeout(initializeCharts, 100);
+        }
+        
+        // Global Filter Functions
+        function applyGlobalFilters() {
+            const startDate = document.getElementById('global_start_date').value;
+            const endDate = document.getElementById('global_end_date').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('start_date', startDate);
+            url.searchParams.set('end_date', endDate);
+            url.searchParams.set('risk_page', '1');
+            url.searchParams.set('package_page', '1');
+            window.location.href = url.toString();
+        }
+        
+        function clearGlobalFilters() {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('start_date');
+            url.searchParams.delete('end_date');
+            url.searchParams.set('risk_page', '1');
+            url.searchParams.set('package_page', '1');
+            window.location.href = url.toString();
+        }
+        
+        // Risk Factors Pagination Functions
+        function goToRiskPage(page) {
+            const startDate = document.getElementById('global_start_date').value;
+            const endDate = document.getElementById('global_end_date').value;
+            const perPage = document.getElementById('risk_per_page') ? document.getElementById('risk_per_page').value : '{{ per_page }}';
+            const url = new URL(window.location.href);
+            url.searchParams.set('risk_page', page);
+            url.searchParams.set('start_date', startDate);
+            url.searchParams.set('end_date', endDate);
+            url.searchParams.set('per_page', perPage);
+            window.location.href = url.toString();
+        }
+        
+        function changeRiskPerPage() {
+            const perPage = document.getElementById('risk_per_page').value;
+            const startDate = document.getElementById('global_start_date').value;
+            const endDate = document.getElementById('global_end_date').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', perPage);
+            url.searchParams.set('risk_page', '1');
+            url.searchParams.set('start_date', startDate);
+            url.searchParams.set('end_date', endDate);
+            window.location.href = url.toString();
+        }
+        
+        // Package Performance Pagination Functions
+        function goToPackagePage(page) {
+            const startDate = document.getElementById('global_start_date').value;
+            const endDate = document.getElementById('global_end_date').value;
+            const perPage = document.getElementById('package_per_page') ? document.getElementById('package_per_page').value : '{{ per_page }}';
+            const url = new URL(window.location.href);
+            url.searchParams.set('package_page', page);
+            url.searchParams.set('start_date', startDate);
+            url.searchParams.set('end_date', endDate);
+            url.searchParams.set('per_page', perPage);
+            window.location.href = url.toString();
+        }
+        
+        function changePackagePerPage() {
+            const perPage = document.getElementById('package_per_page').value;
+            const startDate = document.getElementById('global_start_date').value;
+            const endDate = document.getElementById('global_end_date').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', perPage);
+            url.searchParams.set('package_page', '1');
+            url.searchParams.set('start_date', startDate);
+            url.searchParams.set('end_date', endDate);
+            window.location.href = url.toString();
+        }
+    </script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      MAPIMS AI Health Assessment - Professional Preventive Healthcare
+    </title>
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='favicon_io/favicon.ico') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{{ url_for('static', filename='favicon_io/favicon-16x16.png') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{{ url_for('static', filename='favicon_io/favicon-32x32.png') }}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{{ url_for('static', filename='favicon_io/apple-touch-icon.png') }}"
+    />
+    <link
+      rel="manifest"
+      href="{{ url_for('static', filename='favicon_io/site.webmanifest') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/mapims.css') }}?v=4.9"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Meta Pixel Code -->
+    <script>
+      const META_PIXEL_ID = "YOUR_PIXEL_ID";
+      if (META_PIXEL_ID && META_PIXEL_ID !== "YOUR_PIXEL_ID" && META_PIXEL_ID.trim() !== "") {
+        !(function (f, b, e, v, n, t, s) {
+          if (f.fbq) return;
+          n = f.fbq = function () {
+            n.callMethod
+              ? n.callMethod.apply(n, arguments)
+              : n.queue.push(arguments);
+          };
+          if (!f._fbq) f._fbq = n;
+          n.push = n;
+          n.loaded = !0;
+          n.version = "2.0";
+          n.queue = [];
+          t = b.createElement(e);
+          t.async = !0;
+          t.src = v;
+          s = b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t, s);
+        })(
+          window,
+          document,
+          "script",
+          "https://connect.facebook.net/en_US/fbevents.js"
+        );
+        fbq("init", META_PIXEL_ID);
+        fbq("track", "PageView");
+      }
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display: none" src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1" />
+    </noscript>
+  </head>
+  <body class="landing-page-body">
+    <!-- Header -->
+    <header class="mapims-header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <img
+              src="{{ url_for('static', filename='images/logo.png') }}"
+              alt="MAPIMS Logo"
+              class="logo-image"
+            />
+            <div>
+              <h1 class="mapims-logo">MAPIMS</h1>
+              <p class="tagline" data-translate="header.tagline">Professional Healthcare Excellence</p>
+            </div>
+          </div>
+          <div class="header-nav-wrapper">
+            <div class="header-trust-tag">
+              <span class="trust-dot"></span>
+              <span>NABH Accredited Hospital</span>
+            </div>
+            <nav class="header-nav">
+              <a href="#benefits" data-translate="nav.benefits">Benefits</a>
+              <a href="#how-it-works" data-translate="nav.howItWorks">How It Works</a>
+              <a href="#testimonials" data-translate="nav.testimonials">Testimonials</a>
+              <a href="#faq" data-translate="nav.faq">FAQ</a>
+            </nav>
+            <div class="language-switcher">
+              <button id="languageToggle" class="language-toggle" onclick="toggleLanguage()" title="Switch Language">
+                <span class="globe-icon">🌐</span>
+                <span id="languageIcon">தமிழ்</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section (Modern 2-Column Split Architecture) -->
+    <section class="hero-split-section">
+      <div class="container">
+        <div class="hero-split-grid">
+          
+          <!-- Left Column: Patient Pitch & Direct Action -->
+          <div class="hero-text-col">
+            <div class="hero-text-main">
+              <div class="hero-beacon-pill">
+                <span class="pulse-beacon"></span>
+                <span data-translate="landing.heroBadge">+ AI-POWERED HEALTH INTELLIGENCE</span>
+              </div>
+
+              <h1 class="hero-display-title">
+                <span data-translate="landing.heroTitle">MAPIMS AI Health Assessment</span>
+                <span class="gradient-red-text" data-translate="landing.heroSubtitle">Free in 60 Seconds</span>
+              </h1>
+
+              <p class="hero-lead-desc" data-translate="landing.heroDescription">
+                Advanced AI-Powered Health Assessment for Personalized Care
+              </p>
+
+              <div class="hero-cta-group">
+                <a
+                  href="{{ url_for('assessment') }}"
+                  class="btn-hero-primary"
+                  onclick="if(typeof fbq!=='undefined')fbq('track', 'InitiateCheckout')"
+                >
+                  <span data-translate="landing.ctaButton">Start AI Health Assessment</span>
+                  <span class="btn-arrow">→</span>
+                </a>
+
+                <a href="#how-it-works" class="btn-hero-secondary">
+                  <span>How It Works 📋</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Trust proof badges strip -->
+            <div class="hero-trust-strip">
+              <div class="trust-proof-pill">
+                <span class="proof-icon">⭐</span>
+                <span class="proof-bold">4.9/5 Rating</span>
+                <span class="proof-sub">(10,000+ Screenings)</span>
+              </div>
+              <div class="trust-proof-pill">
+                <span class="proof-icon">⚡</span>
+                <span class="proof-bold">Instant Results</span>
+              </div>
+              <div class="trust-proof-pill">
+                <span class="proof-icon">🔒</span>
+                <span class="proof-bold" data-translate="landing.confidential">100% Confidential</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Quick Start Assessment Card -->
+          <div class="hero-visual-col">
+            <div id="heroQuickStart" class="hero-quickstart-card">
+              
+              <!-- Card Header -->
+              <div class="quickstart-header">
+                <span class="quickstart-tag" data-translate="landing.quickStartBadge">✦ FREE 60-SEC ASSESSMENT</span>
+                <h3 class="quickstart-title" data-translate="landing.quickStartTitle">Start Your Health Check</h3>
+                <p class="quickstart-sub" data-translate="landing.quickStartSub">Personalized AI diagnosis & checkup recommendations</p>
+              </div>
+
+              <!-- Interactive Quick Selection Form -->
+              <div class="quickstart-body">
+                
+                <!-- 1. Gender Selection -->
+                <div class="qstep-group">
+                  <label class="qstep-label" data-translate="landing.selectGender">Select Gender</label>
+                  <div class="qpill-row">
+                    <button type="button" class="qpill-btn qswitch-gender active" data-val="male">
+                      <span class="qpill-icon">👨</span>
+                      <span data-translate="form.male">Male</span>
+                    </button>
+                    <button type="button" class="qpill-btn qswitch-gender" data-val="female">
+                      <span class="qpill-icon">👩</span>
+                      <span data-translate="form.female">Female</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. Age Bracket -->
+                <div class="qstep-group">
+                  <label class="qstep-label" data-translate="landing.selectAge">Your Age Group</label>
+                  <div class="qpill-row qpill-tri">
+                    <button type="button" class="qpill-btn qswitch-age active" data-val="28">
+                      <span>18 – 35 yrs</span>
+                    </button>
+                    <button type="button" class="qpill-btn qswitch-age" data-val="45">
+                      <span>36 – 50 yrs</span>
+                    </button>
+                    <button type="button" class="qpill-btn qswitch-age" data-val="58">
+                      <span>51+ yrs</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Assessment Perks Strip -->
+                <div class="quickstart-perks">
+                  <div class="qperk-item">
+                    <span class="qperk-icon">⚡</span>
+                    <span class="qperk-text" data-translate="landing.perkSpeed">60-Sec AI Analysis</span>
+                  </div>
+                  <div class="qperk-item">
+                    <span class="qperk-icon">🎯</span>
+                    <span class="qperk-text" data-translate="landing.perkMatch">Personalized Match</span>
+                  </div>
+                  <div class="qperk-item">
+                    <span class="qperk-icon">👨‍⚕️</span>
+                    <span class="qperk-text" data-translate="landing.perkDoctor">Doctor Supervised</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- CTA Submit Button -->
+              <div class="quickstart-action">
+                <a
+                  href="{{ url_for('assessment') }}"
+                  class="btn-quickstart-submit"
+                  onclick="if(typeof fbq!=='undefined')fbq('track', 'InitiateCheckout')"
+                >
+                  <span data-translate="landing.continueAssessment">Continue Free Assessment</span>
+                  <span class="btn-arrow">→</span>
+                </a>
+              </div>
+
+              <!-- Card Trust Footer -->
+              <div class="quickstart-footer">
+                <span class="qfoot-item">✓ 100% Free & Confidential</span>
+                <span class="qfoot-dot">•</span>
+                <span class="qfoot-item">NABH Accredited Standard</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="benefits-section">
+      <div class="container">
+        <div class="section-head-wrap">
+          <span class="section-tag-red">WHY MAPIMS</span>
+          <h2 class="section-title" data-translate="landing.benefitsTitle">Why Choose MAPIMS AI Health Assessment?</h2>
+        </div>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">⚡</div>
+            <h3 data-translate="landing.benefit1Title">60-Second Assessment</h3>
+            <p data-translate="landing.benefit1Desc">Get personalized health recommendations in just one minute</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🤖</div>
+            <h3 data-translate="landing.benefit2Title">AI-Powered Analysis</h3>
+            <p data-translate="landing.benefit2Desc">Advanced AI analyzes your health profile with precision</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🏥</div>
+            <h3 data-translate="landing.benefit3Title">Expert Recommendations</h3>
+            <p data-translate="landing.benefit3Desc">Get the right health checkup package for your needs</p>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon">🏆</div>
+            <h3 data-translate="landing.benefit4Title">Professional Excellence</h3>
+            <p data-translate="landing.benefit4Desc">Trusted healthcare with advanced technology and expert care</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Health Risks Section -->
+    <section class="risks-section">
+      <div class="container">
+        <div class="section-head-wrap">
+          <span class="section-tag-red">CLINICAL DETECTION</span>
+          <h2 class="section-title" data-translate="landing.risksTitle">Health Risks Our AI Can Identify</h2>
+        </div>
+        <div class="risks-grid">
+          <div class="risk-card">
+            <div class="risk-header-icon">❤️</div>
+            <h3 data-translate="landing.risk1Title">Cardiovascular</h3>
+            <p data-translate="landing.risk1Desc">Heart disease, hypertension, stroke risks</p>
+          </div>
+          <div class="risk-card">
+            <div class="risk-header-icon">🩺</div>
+            <h3 data-translate="landing.risk2Title">Metabolic</h3>
+            <p data-translate="landing.risk2Desc">Diabetes, thyroid, cholesterol issues</p>
+          </div>
+          <div class="risk-card">
+            <div class="risk-header-icon">🫁</div>
+            <h3 data-translate="landing.risk3Title">Respiratory</h3>
+            <p data-translate="landing.risk3Desc">Lung conditions, breathing problems</p>
+          </div>
+          <div class="risk-card">
+            <div class="risk-header-icon">🧬</div>
+            <h3 data-translate="landing.risk4Title">Lifestyle</h3>
+            <p data-translate="landing.risk4Desc">Stress, sleep, exercise patterns</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works-section">
+      <div class="container">
+        <div class="section-head-wrap">
+          <span class="section-tag-red">STEP-BY-STEP PROCESS</span>
+          <h2 class="section-title" data-translate="landing.howItWorksTitle">How It Works</h2>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <h3 data-translate="landing.step1Title">Fill Assessment</h3>
+            <p data-translate="landing.step1Desc">Answer simple questions about your health</p>
+          </div>
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <h3 data-translate="landing.step2Title">AI Analysis</h3>
+            <p data-translate="landing.step2Desc">Our AI analyzes your health profile</p>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <h3 data-translate="landing.step3Title">Get Recommendations</h3>
+            <p data-translate="landing.step3Desc">Receive personalized package suggestions</p>
+          </div>
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <h3 data-translate="landing.step4Title">Book & Pay</h3>
+            <p data-translate="landing.step4Desc">Choose your package and schedule appointment</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hospital Trust Section -->
+    <section class="trust-section">
+      <div class="container">
+        <div class="trust-content-box">
+          <span class="trust-seal-icon">🏥</span>
+          <h2 class="trust-title" data-translate="landing.trustTitle">Why Choose MAPIMS?</h2>
+          <p class="trust-message" data-translate="landing.trustMessage1">
+            MAPIMS is a leading healthcare institution committed to providing world-class medical services. Our state-of-the-art facilities, experienced medical professionals, and advanced diagnostic technologies ensure accurate health assessments and personalized treatment plans.
+          </p>
+          <p class="trust-message" data-translate="landing.trustMessage2">
+            With a focus on preventive care and early detection, we help you maintain optimal health through comprehensive health checkups and expert medical guidance.
+          </p>
+          <div class="trust-badges-row">
+            <span class="trust-sub-badge">✓ NABH Accredited Campus</span>
+            <span class="trust-sub-badge">✓ Dedicated Executive Lounge</span>
+            <span class="trust-sub-badge">✓ Digital Reports on WhatsApp</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section">
+      <div class="container">
+        <div class="section-head-wrap">
+          <span class="section-tag-red">PATIENT EXPERIENCES</span>
+          <h2 class="section-title" data-translate="landing.testimonialsTitle">What Our Patients Say</h2>
+        </div>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testimonial-text" data-translate="landing.testimonial1Text">
+              "The AI assessment was so accurate! MAPIMS recommended exactly what I needed."
+            </p>
+            <div class="testi-footer">
+              <span class="testi-avatar">RK</span>
+              <div>
+                <p class="testimonial-author" data-translate="landing.testimonial1Author">Rajesh K., Age 45</p>
+                <small class="testi-verified">✓ Verified Diabetic Checkup</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testimonial-text" data-translate="landing.testimonial2Text">
+              "Professional service and accurate recommendations. MAPIMS truly cares about patient health."
+            </p>
+            <div class="testi-footer">
+              <span class="testi-avatar">PM</span>
+              <div>
+                <p class="testimonial-author" data-translate="landing.testimonial2Author">Priya M., Age 38</p>
+                <small class="testi-verified">✓ Verified Master Health Check</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testimonial-text" data-translate="landing.testimonial3Text">
+              "Quick, easy, and the recommendations were spot on. Highly recommend!"
+            </p>
+            <div class="testi-footer">
+              <span class="testi-avatar">AS</span>
+              <div>
+                <p class="testimonial-author" data-translate="landing.testimonial3Author">Amit S., Age 52</p>
+                <small class="testi-verified">✓ Verified Executive Cardio Check</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+      <div class="container">
+        <div class="section-head-wrap">
+          <span class="section-tag-red">PATIENT QUERIES</span>
+          <h2 class="section-title" data-translate="landing.faqTitle">Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item open" role="button" tabindex="0" aria-expanded="true">
+            <div class="faq-question-row">
+              <h3 data-translate="landing.faq1Question">Is the assessment really free?</h3>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <p class="faq-answer" data-translate="landing.faq1Answer">
+              Yes! The AI health assessment is completely free. You only pay when you book a health checkup package.
+            </p>
+          </div>
+
+          <div class="faq-item" role="button" tabindex="0" aria-expanded="false">
+            <div class="faq-question-row">
+              <h3 data-translate="landing.faq2Question">How accurate is the AI analysis?</h3>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <p class="faq-answer" data-translate="landing.faq2Answer">
+              Our AI uses advanced algorithms trained on medical data to provide accurate health risk assessments.
+            </p>
+          </div>
+
+          <div class="faq-item" role="button" tabindex="0" aria-expanded="false">
+            <div class="faq-question-row">
+              <h3 data-translate="landing.faq3Question">Is my data secure?</h3>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <p class="faq-answer" data-translate="landing.faq3Answer">
+              Absolutely. We follow strict privacy protocols and your data is encrypted and secure.
+            </p>
+          </div>
+
+          <div class="faq-item" role="button" tabindex="0" aria-expanded="false">
+            <div class="faq-question-row">
+              <h3 data-translate="landing.faq4Question">Can I book home sample collection?</h3>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <p class="faq-answer" data-translate="landing.faq4Answer">
+              Yes! We offer both hospital visits and home sample collection for your convenience.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- High-Impact Pre-Footer CTA Section -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-banner-card">
+          <h2 class="cta-title" data-translate="landing.ctaTitle">Ready to Know Your Health Status?</h2>
+          <p class="cta-text" data-translate="landing.ctaText">Get your free AI health assessment in 60 seconds</p>
+          <a
+            href="{{ url_for('assessment') }}"
+            class="cta-button-large"
+            onclick="if(typeof fbq!=='undefined')fbq('track', 'InitiateCheckout')"
+          >
+            <span data-translate="landing.ctaButtonLarge">Start Free Assessment Now</span>
+            <span class="btn-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mapims-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <div class="footer-brand-logo">
+              <img src="{{ url_for('static', filename='images/logo.png') }}" alt="MAPIMS Logo" class="footer-logo-img">
+              <h3 class="footer-brand-name">MAPIMS</h3>
+            </div>
+            <p class="footer-hospital-fullname">Melmaruvathur Adhiparasakthi Institute of Medical Sciences</p>
+            <p data-translate="footer.tagline">Professional Healthcare Excellence</p>
+            <p data-translate="footer.subtagline">Advanced Medical Care & Diagnostic Technology</p>
+          </div>
+          <div class="footer-section">
+            <h4 data-translate="footer.quickLinks">Quick Links</h4>
+            <a href="{{ url_for('landing') }}" data-translate="nav.home">Home</a>
+            <a href="{{ url_for('assessment') }}" data-translate="nav.assessment">Health Assessment</a>
+            <a href="#how-it-works" data-translate="nav.howItWorks">How It Works</a>
+            <a href="#faq" data-translate="nav.faq">FAQ</a>
+          </div>
+          <div class="footer-section">
+            <h4 data-translate="footer.contact">Hospital Contact</h4>
+            <p><strong>Campus Location:</strong> GST Road, Melmaruvathur - 603319, Tamil Nadu</p>
+            <p><strong>Helpline:</strong> +91 44 2752 9000</p>
+            <p data-translate="footer.email">Email: info@mapims.org</p>
+            <p>
+              <span data-translate="footer.website">Website:</span>
+              <a href="https://mapims.org" target="_blank" rel="noopener">mapims.org</a>
+            </p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p data-translate="footer.copyright">
+            &copy; 2025 MAPIMS. All rights reserved. | Professional Healthcare Solutions
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}?v=4.9"></script>
+    <script src="{{ url_for('static', filename='js/landing.js') }}?v=4.9"></script>
+  </body>
+</html>
